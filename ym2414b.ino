@@ -4,6 +4,7 @@
 #define YM_CTRL_PORT PORTC
 #define YM_DATA_DDR DDRD
 #define YM_DATA_PORT PORTD
+#define YM_DATA_PIN PIND
 
 #define YM_CS (3) // PC2 (= pin A2 for Arduino UNO)
 #define YM_RD (2) // PC2 (= pin A2 for Arduino UNO)
@@ -22,27 +23,54 @@ void wait(uint8_t loop)
 	}
 }
 
-static void write_ym(uint8_t data)
-{
-	YM_CTRL_PORT &= ~_BV(YM_CS); // CS LOW
-	YM_CTRL_PORT &= ~_BV(YM_WR); // Write data
-	YM_DATA_PORT = data;
-	delayMicroseconds(7);
-	YM_CTRL_PORT |= _BV(YM_WR);
-	delayMicroseconds(7);
-	YM_CTRL_PORT |= _BV(YM_CS); // CS HIGH
-	delayMicroseconds(7);
-	YM_DATA_PORT = 0x00;
-}
-
 static void setreg(uint8_t reg, uint8_t data)
 {
-	wait(4);
-	YM_CTRL_PORT &= ~_BV(YM_A0); // A0 low (select register)
-	write_ym(reg);
-	YM_CTRL_PORT |= _BV(YM_A0); // A0 high (write register)
-	write_ym(data);
+	static uint8_t last_write_addr = 0x00;
 
+	if (last_write_addr != 0x20)
+	{
+		YM_DATA_DDR = 0x00; 					// input mode for data bus pins
+		wait(8);
+		YM_CTRL_PORT &= ~_BV(YM_A0); 			// A0 low - read
+		wait(4);
+		for (uint8_t i = 0; i < 32; i++)
+		{
+			YM_CTRL_PORT &= ~_BV(YM_RD);		// RD low - read data
+			wait(4);
+
+			if ((YM_DATA_PIN & _BV(7)) == 0) 	// D7 contains 0 when write has completed, 1 - when not
+			{
+				YM_CTRL_PORT |= _BV(YM_RD);		// RD high - stop reading data if D7 == 0
+				wait(4);
+				break;
+			}
+
+			YM_CTRL_PORT |= _BV(YM_RD);			// RD high - stop reading data anyway
+			wait(8);							// wait some more
+			if (i > 16)
+			{
+				delayMicroseconds(1);
+			}
+		}
+		YM_DATA_DDR = 0xff;				// output mode for data bus pins
+		wait(8);
+	}
+	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
+	YM_DATA_PORT = reg;				// register address
+	wait(4);
+	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
+	wait(4);						// wait for address to be read by YM chip
+	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
+	wait(2);
+	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
+	YM_DATA_PORT = data;			// register data
+	wait(4);
+	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
+	wait(4);						// wait for address to be read by YM chip
+	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
+	wait(2);
+
+	last_write_addr = reg;
 }
 
 void setup()
@@ -53,7 +81,10 @@ void setup()
 	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);
 	YM_DATA_DDR = 0xFF;
 	YM_CTRL_PORT |= _BV(YM_CS) | _BV(YM_WR) | _BV(YM_RD); /* CS and WR HIGH by default */
-	YM_CTRL_PORT &= ~(_BV(YM_A0)); 	/* A0 LOW by default */
+
+	YM_CTRL_PORT &= ~_BV(YM_A0); 	/* A0 LOW by default */
+	YM_CTRL_PORT &= ~_BV(YM_CS); // CS LOW
+
 
 	// reset YM
 	digitalWrite(pinIC, LOW);
@@ -89,12 +120,12 @@ void setup()
 
 void loop()
 {
-	set_note(0, 37);
+	set_note(0, 47);
 	//Serial.println("1");
-	delay(2000);
+	delay(1000);
 	unset_note(0);
 	//Serial.println("0");
-	delay(1000);
+	//delay(1000);
 	//load_patch(0);
 	//process_encoders();
 	//update_display();
@@ -105,20 +136,20 @@ void load_patch(uint16_t i)
 {
 	uint8_t patch[38] =
 	{
-		/*
+
 		6, 3,
 		31, 5, 5, 5, 2, 33, 1, 8, 3,
 		27, 11, 0, 6, 15, 0, 1, 2, 3,
 		31, 6, 7, 6, 5, 0, 2, 0, 7,
 		31, 11, 8, 6, 3, 0, 1, 1, 7
+
+		/*
+				4, 3,
+				30, 0, 0, 0, 0, 23, 0, 1, 3,
+				27, 4, 0, 7, 1, 0, 0, 1, 3,
+				30, 0, 0, 0, 0, 18, 0, 1, 7,
+				25, 4, 0, 7, 1, 0, 0, 1, 7
 		*/
-
-		4, 3,
-		30, 0, 0, 0, 0, 23, 0, 1, 3,
-		27, 4, 0, 7, 1, 0, 0, 1, 3,
-		30, 0, 0, 0, 0, 18, 0, 1, 7,
-		25, 4, 0, 7, 1, 0, 0, 1, 7
-
 	};
 
 	/*
@@ -141,7 +172,7 @@ void load_patch(uint16_t i)
 	DT* - Detune
 	*/
 
-	setreg(0x20, 0x00 | (patch[i + 1] << 3) | patch[i + 0]);		// no output(RL) + FB + CONECT
+	setreg(0x20, 0xc0 | (patch[i + 1] << 3) | patch[i + 0]);		// RL + FB + CONECT
 
 	for (uint8_t j = 0; j < 8; j++)									// we support only single mode => iterate settings across all 8 channels
 	{
@@ -172,8 +203,6 @@ void load_patch(uint16_t i)
 		setreg(0xf8 + j, (patch[i + 33] << 4) | patch[i + 32]);		// Decay(1) level + Release rate channel J op 2
 	}
 
-	setreg(0x20, 0xc0 | (patch[i + 1] << 3) | patch[i + 0]);		// RL + FB + CONECT
-
 }
 
 void set_note(uint8_t voice, uint8_t midi_note)
@@ -181,7 +210,7 @@ void set_note(uint8_t voice, uint8_t midi_note)
 	uint8_t octave;
 	uint8_t note;
 	uint8_t fraction = 0;
-	// For some reason YM2151 supports 8 ocataves (0-7) each starting with C# and ending with C
+	// For some reason YM2414B supports 8 ocataves (0-7) each starting with C# and ending with C
 	// A4 = 440Hz according to application notes (2.1.2) && MIDI A4 = 440Hz => we support MIDI notes
 	// from 1 to 96 inclusive and ignore others
 	if ((midi_note > 0) && (midi_note < 97))						// ignore notes that are not supported by YM2151

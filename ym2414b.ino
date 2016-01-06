@@ -1,28 +1,43 @@
+// Some code grabbed from YM2151 Library, see http://www.ooishoo.org/?page_id=15
+
 #define YM_CTRL_DDR DDRC
 #define YM_CTRL_PORT PORTC
 #define YM_DATA_DDR DDRD
 #define YM_DATA_PORT PORTD
 
-#define YM_CS (2) // PC2 (= pin A2 for Arduino UNO)
+#define YM_CS (3) // PC2 (= pin A2 for Arduino UNO)
+#define YM_RD (2) // PC2 (= pin A2 for Arduino UNO)
 #define YM_WR (1) // PC1 (= pin A1 for Arduino UNO)
 #define YM_A0 (0) // PC0 (= pin A0 for Arduino UNO)
 
 const int pinIC = 12;
 
+void wait(uint8_t loop)
+{
+	uint8_t wi;
+	for (wi = 0; wi < loop; wi++)
+	{
+		// 16MHz  nop = @60nSec
+		asm volatile("nop\n\t nop\n\t nop\n\t nop\n\t");
+	}
+}
+
 static void write_ym(uint8_t data)
 {
 	YM_CTRL_PORT &= ~_BV(YM_CS); // CS LOW
-	YM_DATA_PORT = data;
 	YM_CTRL_PORT &= ~_BV(YM_WR); // Write data
+	YM_DATA_PORT = data;
 	delayMicroseconds(7);
 	YM_CTRL_PORT |= _BV(YM_WR);
 	delayMicroseconds(7);
 	YM_CTRL_PORT |= _BV(YM_CS); // CS HIGH
 	delayMicroseconds(7);
+	YM_DATA_PORT = 0x00;
 }
 
 static void setreg(uint8_t reg, uint8_t data)
 {
+	wait(4);
 	YM_CTRL_PORT &= ~_BV(YM_A0); // A0 low (select register)
 	write_ym(reg);
 	YM_CTRL_PORT |= _BV(YM_A0); // A0 high (write register)
@@ -35,14 +50,14 @@ void setup()
 	// init pins
 	pinMode(pinIC, OUTPUT);
 
-	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_WR) | _BV(YM_A0);
+	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);
 	YM_DATA_DDR = 0xFF;
-	YM_CTRL_PORT |= _BV(YM_CS) | _BV(YM_WR); /* CS and WR HIGH by default */
+	YM_CTRL_PORT |= _BV(YM_CS) | _BV(YM_WR) | _BV(YM_RD); /* CS and WR HIGH by default */
 	YM_CTRL_PORT &= ~(_BV(YM_A0)); 	/* A0 LOW by default */
 
 	// reset YM
 	digitalWrite(pinIC, LOW);
-	delay(1000);
+	delay(100);
 	digitalWrite(pinIC, HIGH);
 
 	for (uint8_t j = 0; j < 8; j++)
@@ -57,6 +72,8 @@ void setup()
 	setreg(0x1B, 0x00);	// LFO wafeform = sawtooth
 
 	load_patch(0);
+
+	delay(1000);
 	/*
 
 		for (uint8_t j = 0; j < 8; j++)									// we support only single mode => iterate settings across all 8 channels
@@ -72,7 +89,7 @@ void setup()
 
 void loop()
 {
-	set_note(0, 27);
+	set_note(0, 37);
 	//Serial.println("1");
 	delay(2000);
 	unset_note(0);
@@ -124,7 +141,7 @@ void load_patch(uint16_t i)
 	DT* - Detune
 	*/
 
-	setreg(0x20, 0xc0 | (patch[i + 1] << 3) | patch[i + 0]);		// RL + FB + CONECT
+	setreg(0x20, 0x00 | (patch[i + 1] << 3) | patch[i + 0]);		// no output(RL) + FB + CONECT
 
 	for (uint8_t j = 0; j < 8; j++)									// we support only single mode => iterate settings across all 8 channels
 	{
@@ -154,6 +171,9 @@ void load_patch(uint16_t i)
 		setreg(0xf0 + j, (patch[i + 24] << 4) | patch[i + 23]);		// Decay(1) level + Release rate channel J op 2
 		setreg(0xf8 + j, (patch[i + 33] << 4) | patch[i + 32]);		// Decay(1) level + Release rate channel J op 2
 	}
+
+	setreg(0x20, 0xc0 | (patch[i + 1] << 3) | patch[i + 0]);		// RL + FB + CONECT
+
 }
 
 void set_note(uint8_t voice, uint8_t midi_note)

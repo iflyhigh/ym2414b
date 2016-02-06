@@ -141,74 +141,46 @@ void wait(uint8_t loop)
 
 static void setreg(uint8_t reg, uint8_t data)
 {
+	uint8_t ym_busy = 1;
 
-	// the code is probably too tight, unstable data flow
-	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
-	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(1);
-	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
-	YM_DATA_PORT = reg;				// register address
-	wait(3);
-	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
-	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
-	wait(15);
-	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(1);
-	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
-	YM_DATA_PORT = data;			// register data
-	wait(3);
-	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
-	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
+	YM_DATA_DDR = 0x00; 				// input mode for data bus pins
+	YM_CTRL_PORT &= ~_BV(YM_A0); 		// A0 low - read
+
+	while (ym_busy)
+	{
+
+		YM_CTRL_PORT &= ~_BV(YM_RD);	// RD low - read data
+		wait(1);
+		YM_CTRL_PORT &= ~_BV(YM_CS);	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
+		wait(3);
+		ym_busy = (YM_DATA_PIN & _BV(7));
+		YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
+		YM_CTRL_PORT |= _BV(YM_RD);		// RD high - stop reading data
+		wait(50);
+	}
+
+	ym_busy = 1;
+	YM_DATA_DDR = 0xff;
 	wait(50);
 
-
-	/*
-	yamaha[reg] = data;
-
-	YM_DATA_DDR = 0x00; 					// input mode for data bus pins
-	wait(8);
-	YM_CTRL_PORT &= ~_BV(YM_A0); 			// A0 low - read
-	wait(4);
-	for (uint8_t i = 0; i < 32; i++)
-	{
-	YM_CTRL_PORT &= ~_BV(YM_RD);		// RD low - read data
-	wait(4);
-
-	if ((YM_DATA_PIN & _BV(7)) == 0) 	// D7 contains 0 when write has completed, 1 - when not
-	{
-		YM_CTRL_PORT |= _BV(YM_RD);		// RD high - stop reading data if D7 == 0
-		wait(4);
-		break;
-	}
-
-	YM_CTRL_PORT |= _BV(YM_RD);			// RD high - stop reading data anyway
-	wait(8);							// wait some more
-	if (i > 16)
-	{
-		delayMicroseconds(1);
-	}
-	}
-	wait(8);
-	YM_DATA_DDR = 0xff;				// output mode for data bus pins
-	wait(8);
-	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
+	// YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
+	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
+	wait(1);
+	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 	YM_DATA_PORT = reg;				// register address
-	wait(4);
-	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(4);						// wait for address to be read by YM chip
+	wait(3);
+	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	wait(2);
 	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
-	YM_DATA_PORT = data;			// register data
-	wait(4);
+	wait(60);
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(4);						// wait for address to be read by YM chip
+	wait(1);
+	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
+	YM_DATA_PORT = data;			// register data
+	wait(3);
+	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	wait(8);
-
-	*/
-
+	wait(60);
 }
 
 void setup()
@@ -324,16 +296,16 @@ void load_patch(uint16_t i)
 			else																					// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-				       ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+					   ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x60 + j + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |						// KRS + FIX + AR = Key rate scaling ...
-			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
+				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.op[k].f & 0x03) << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
-			       voice.rev);																		// ... + reverb rate
+				   voice.rev);																		// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);			// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}

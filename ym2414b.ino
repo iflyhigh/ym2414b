@@ -144,14 +144,14 @@ static void setreg(uint8_t reg, uint8_t data)
 	uint8_t ym_busy = 1;
 
 	YM_DATA_DDR = 0x00; 				// input mode for data bus pins
-	YM_CTRL_PORT &= ~_BV(YM_A0); 		// A0 low - read
+	YM_CTRL_PORT |= _BV(YM_A0);
+	YM_CTRL_PORT |= _BV(YM_WR);
 
 	while (ym_busy)
 	{
-
 		YM_CTRL_PORT &= ~_BV(YM_RD);	// RD low - read data
 		wait(1);
-		YM_CTRL_PORT &= ~_BV(YM_CS);	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
+		YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 		wait(3);
 		ym_busy = (YM_DATA_PIN & _BV(7));
 		YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
@@ -163,7 +163,7 @@ static void setreg(uint8_t reg, uint8_t data)
 	YM_DATA_DDR = 0xff;
 	wait(50);
 
-	// YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
+	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
 	wait(1);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
@@ -187,17 +187,18 @@ void setup()
 {
 	// init pins
 	pinMode(pinIC, OUTPUT);
+	pinMode(13, OUTPUT);
 
 	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);	// output mode for control pins
 	YM_DATA_DDR = 0xff;													// output mode for data bus pins
 	YM_CTRL_PORT |= _BV(YM_WR) | _BV(YM_RD); 							// WR and RD high by default
-	//YM_CTRL_PORT &= ~_BV(YM_A0); 										// A0 low by default
-	//YM_CTRL_PORT &= ~_BV(YM_CS); 										// CS always low
 
 	// reset YM
 	digitalWrite(pinIC, LOW);
 	delay(100);
 	digitalWrite(pinIC, HIGH);
+
+	delay(1000);
 
 	// setup as TZ81Z does during poweron
 
@@ -207,25 +208,15 @@ void setup()
 	setreg(0x1e, 0x00);
 	setreg(0x0a, 0x04);
 	setreg(0x14, 0x70);
-	// setreg(0x15, 0x01); // this causes severe sound distortion, TBD
+	setreg(0x15, 0x01);
+
+	load_patch(0);
 
 	for (uint8_t j = 0; j < 8; j++)
 	{
 		setreg(0x08, 0x00 + j);	// Key OFF channel j
 	}
-
-//	Serial.begin(9600);
-	load_patch(0);
-
-	delay(1000);
-	/*
-		for (uint16_t i = 0; i <= 255; i++)
-		{
-			Serial.print(i, HEX);
-			Serial.print(" - ");
-			Serial.println(yamaha[i], HEX);
-		}
-	*/
+	// Serial.begin(9600);
 }
 
 void loop()
@@ -238,44 +229,42 @@ void loop()
 		delay(1000);
 	}
 	delay(3000);
-
 //load_patch(0);
 //process_encoders();
 //update_display();
 //MIDI.read();
 }
 
-
 void load_patch(uint16_t i)
 {
 	unsigned char data[84] =
 	{
-		0x1F, 0x01, 0x00, 0x08, 0x0A, 0x00, 0x03, 0x43, 0x0A, 0x1E, 0x1F, 0x01, 0x00, 0x08, 0x07, 0x00,
-		0x00, 0x46, 0x00, 0x10, 0x1F, 0x09, 0x06, 0x08, 0x0F, 0x1B, 0x07, 0x4A, 0x04, 0x1E, 0x1F, 0x09,
-		0x00, 0x09, 0x0F, 0x00, 0x01, 0x63, 0x04, 0x03, 0x3A, 0x1C, 0x00, 0x00, 0x00, 0x52, 0x0C, 0x04,
-		0x0D, 0x00, 0x63, 0x4B, 0x00, 0x00, 0x00, 0x32, 0x00, 0x4D, 0x6F, 0x6E, 0x6F, 0x70, 0x68, 0x42,
-		0x61, 0x73, 0x73, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x50, 0x00,
-		0x00, 0x00, 0x00, 0x00
+		0x0B, 0x04, 0x05, 0x04, 0x0F, 0x00, 0x42, 0x55, 0x22, 0x06, 0x0A, 0x07, 0x04, 0x04, 0x0F, 0x00,
+		0x02, 0x47, 0x0A, 0x00, 0x0B, 0x1F, 0x02, 0x04, 0x0F, 0x00, 0x02, 0x63, 0x0D, 0x06, 0x0B, 0x1F,
+		0x02, 0x05, 0x0F, 0x00, 0x02, 0x62, 0x04, 0x00, 0x1C, 0x1E, 0x06, 0x11, 0x09, 0x5A, 0x0C, 0x04,
+		0x04, 0x00, 0x63, 0x28, 0x00, 0x00, 0x00, 0x32, 0x00, 0x42, 0x6F, 0x77, 0x65, 0x64, 0x42, 0x65,
+		0x6C, 0x6C, 0x20, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x04, 0x00, 0x00
 	};
 	memcpy(&voice, data, 84);
 
-	// setreg(0x16, lfs_vmem_reg[voice.lfs]);														// UNUSED !!! LFRQ2 = LFO2 Speed
-	// setreg(0x17, 0x26);
-	// setreg(0x17, 0x80);
-	// setreg(0x17, amd_vmem_reg[voice.amd]);														// AMD2 = LFO2 Amplitude Modulation Depth
-	// setreg(0x17, 0x80 | pmd_vmem_reg[voice.pmd]);												// PMD2 = LFO2 Pitch Modulation Depth
+
+
+	//setreg(0x16, lfo_vmem_reg[voice.lfs]);														// UNUSED !!! LFRQ2 = LFO2 Speed
+	//setreg(0x17, amd_vmem_reg[voice.amd]);														// AMD2 = LFO2 Amplitude Modulation Depth
+	//setreg(0x17, 0x80 | pmd_vmem_reg[voice.pmd]);												// PMD2 = LFO2 Pitch Modulation Depth
 	setreg(0x18, lfo_vmem_reg[voice.lfs]);															// LFRQ1 = LFO1 Speed
 	setreg(0x19, amd_vmem_reg[voice.amd]);															// AMD1 = LFO1 Amplitude Modulation Depth
-	setreg(0x19, 0x80 | pmd_vmem_reg[voice.amd]);													// PMD1 = LFO1 Pitch Modulation Depth
-//	setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
-//	       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));							// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
+	setreg(0x19, 0x80 | pmd_vmem_reg[voice.pmd]);													// PMD1 = LFO1 Pitch Modulation Depth
+	//setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
+	//       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));							// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
 	setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
 
 	for (uint8_t j = 0; j < 8; j++)																	// we support only single mode => iterate settings across all 8 channels
 	{
 		setreg(0x20 + j, 0xc0 | (voice.sy_fbl_alg & 0x3f));											// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
 		setreg(0x38 + j, (voice.pms_ams_lfw & 0x70) | ((voice.pms_ams_lfw & 0x0c) >> 2));			// PMS1 + AMS1 = LFO1 Pitch/Amplitude Modulation Sensitivity
-		// setreg(0x38 + j, 0x84 | (voice.pms_ams_lfw & 0x70) | ((voice.pms_ams_lfw & 0x0c) >> 2));	// UNUSED !!! PMS2 + AMS2 = LFO2 Pitch/Amplitude Modulation Sensitivity
+		//setreg(0x38 + j, 0x84 | (voice.pms_ams_lfw & 0x70) | ((voice.pms_ams_lfw & 0x0c) >> 2));	// UNUSED !!! PMS2 + AMS2 = LFO2 Pitch/Amplitude Modulation Sensitivity
 
 		for (uint8_t k = 0; k < 4; k++)																// iterate across operators
 		{
@@ -296,21 +285,20 @@ void load_patch(uint16_t i)
 			else																					// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-					   ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+				       ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x60 + j + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |						// KRS + FIX + AR = Key rate scaling ...
-				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
+			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.op[k].f & 0x03) << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
-				   voice.rev);																		// ... + reverb rate
+			       voice.rev);																		// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);			// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
 }
-
 
 void set_note(uint8_t channel, uint8_t midi_note)
 {
@@ -327,47 +315,19 @@ void set_note(uint8_t channel, uint8_t midi_note)
 		if (note > 2) {note++;};									// YM2151 note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
 		if (note > 6) {note++;};									// Why?
 		if (note > 10) {note++;};									// Because we can! :)
-		/*
-				for (uint8_t k = 0; k < 4; k++)
-				{
-					setreg(0xe0 + channel + 0x08 * k, 0xfe);					// D1L + RR
-					setreg(0xc0 + channel + 0x08 * k, 0x28);					// EGS + REV
-				}
 
-				setreg(0x08, 0x00 | channel);
+		for (uint8_t k = 0; k < 4; k++)
+		{
+			setreg(0x60 + channel + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
+		}
 
-				for (uint8_t k = 0; k < 4; k++)
-				{
-					setreg(0x60 + channel + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
-				}
-		*/
 		setreg(0x28 + channel, (octave << 4) | note);					// Set channel note
 		setreg(0x30 + channel, (fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
-		/*				setreg(0x20 + channel, 0xc0 | (voice.sy_fbl_alg & 0x3f));		// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
-
-						for (uint8_t k = 0; k < 4; k++)
-						{
-							setreg(0xe0 + channel + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);			// D1L + RR = Operator Decay 1 Level + Release Rate
-							setreg(0xc0 + channel + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
-							       voice.rev);																		// ... + reverb rate
-						}
-
-				setreg(0x20 + channel, 0x80 | (voice.sy_fbl_alg & 0x3f));		// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
-		*/
 		setreg(0x08, 0x78 | channel);									// Key ON for channel (all 4 OPs are running)
-		//setreg(0x14, 0x40);												// TIMER
 	}
 }
 
 void unset_note(uint8_t channel)
 {
-	/*
-	for (uint8_t k = 0; k < 4; k++)
-	{
-		setreg(0xe0 + channel + 0x08 * k, 0xfe);					// D1L + RR
-		setreg(0xc0 + channel + 0x08 * k, 0x28);					// EGS + REV
-	}
-	*/
 	setreg(0x08, 0x00 | channel);
-	//setreg(0x20 + channel, 0xc0 | (voice.sy_fbl_alg & 0x3f));			// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
 }

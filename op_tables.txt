@@ -1,0 +1,10 @@
+ALG OP1 OP2 OP3 OP4
+-------------------
+0   a   a   a   a
+1   a   a   a   a
+2   a   a   a   a
+3   a   a   a   a
+4   b   a   b   a
+5   c   c   c   a
+6   c   c   c   a
+7   d   d   d   d  

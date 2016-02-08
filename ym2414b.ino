@@ -15,6 +15,7 @@
 const int pinIC = 12;
 
 uint8_t yamaha[256];
+uint8_t yamaha2[256];
 
 struct 	op_t	// FM operator settings
 {
@@ -71,34 +72,6 @@ struct voice_t
 
 voice_t voice;
 
-uint8_t lfo_vmem_reg[100] =
-{
-	0, 31, 74, 89, 106, 114, 125, 133, 138, 144,
-	148, 153, 157, 161, 165, 167, 171, 173, 176, 178,
-	181, 184, 185, 188, 189, 191, 194, 195, 197, 198,
-	200, 201, 203, 205, 206, 207, 208, 210, 211, 212,
-	213, 214, 216, 217, 218, 219, 220, 221, 222, 223,
-	223, 225, 226, 226, 227, 228, 229, 230, 231, 231,
-	232, 233, 234, 234, 235, 236, 237, 237, 238, 238,
-	239, 240, 240, 241, 242, 242, 243, 244, 244, 245,
-	246, 246, 247, 247, 248, 249, 249, 250, 250, 251,
-	251, 252, 252, 253, 253, 253, 254, 255, 255, 255
-};
-
-uint8_t lfo_sh_vmem_reg[100] =
-{
-	0, 2, 5, 7, 10, 12, 15, 18, 20, 23,
-	25, 28, 30, 33, 36, 38, 41, 43, 46, 48,
-	51, 54, 56, 59, 61, 64, 67, 69, 72, 74,
-	77, 79, 82, 85, 87, 90, 92, 95, 97, 100,
-	103, 105, 108, 110, 113, 116, 118, 121, 123, 126,
-	128, 131, 134, 136, 139, 141, 144, 146, 149, 152,
-	154, 157, 159, 162, 165, 167, 170, 172, 175, 177,
-	180, 183, 185, 188, 190, 193, 195, 198, 201, 203,
-	206, 208, 211, 213, 216, 219, 221, 224, 226, 229,
-	232, 234, 237, 239, 242, 244, 247, 250, 252, 255
-};
-
 uint8_t pmd_vmem_reg[100] =
 {
 	0,  0,  2,  3,  4,  5,  7,  8,  9, 11,
@@ -114,7 +87,6 @@ uint8_t pmd_vmem_reg[100] =
 };
 
 uint8_t amd_vmem_reg[100] =
-
 {
 	0,  0,  0,  0,  0,  1,  1,  1,  1,  2,
 	2,  2,  2,  3,  3,  3,  3,  4,  4,  4,
@@ -128,99 +100,134 @@ uint8_t amd_vmem_reg[100] =
 	54, 56, 60, 62, 67, 70, 77, 86, 96, 127
 };
 
-
-uint8_t tl_a_vmem_reg[100] =
+uint8_t mul_vmem_reg[64] =
 {
-	127, 122, 118, 114, 110, 107, 104, 102, 100, 98,
-	96, 94, 90, 92, 88, 86, 85, 84, 82, 81,
-	79, 78, 77, 76, 75, 74, 73, 72, 71, 70,
-	69, 68, 67, 66, 65, 64, 63, 62, 61, 60,
-	59, 58, 57, 56, 55, 54, 53, 52, 51, 50,
-	49, 48, 47, 46, 45, 44, 43, 42, 41, 40,
-	39, 38, 37, 36, 35, 34, 33, 32, 31, 30,
-	29, 28, 27, 26, 25, 24, 23, 22, 21, 20,
-	19, 18, 17, 16, 15, 14, 13, 12, 11, 10,
-	9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+	0, 0, 0, 0, 1, 1, 1, 1,
+	2, 2, 3, 2, 2, 4, 3, 3,
+	5, 3, 4, 6, 4, 4, 7, 5,
+	5, 8, 6, 5, 9, 6, 7, 10,
+	6, 7, 11, 8, 12, 7, 8, 9,
+	13,	8, 14, 10, 9, 15, 9, 11,
+	10,	12, 11, 10, 13, 12, 11, 14,
+	13,	12, 15, 14, 13, 15, 14, 15
 };
 
-uint8_t tl_b_vmem_reg[100] =
+uint8_t dt2_vmem_reg[64] =
 {
-	127, 127, 126, 122, 118, 115, 112, 110, 108, 106,
-	104, 102, 100, 98, 96, 94, 93, 92, 90, 89,
-	87, 86, 85, 84, 83, 82, 81, 80, 79, 78,
-	77, 76, 75, 74, 73, 72, 71, 70, 69, 68,
-	67, 66, 65, 64, 63, 62, 61, 60, 59, 58,
-	57, 56, 55, 54, 53, 52, 51, 50, 49, 48,
-	47, 46, 45, 44, 43, 42, 41, 40, 39, 38,
-	37, 36, 35, 34, 33, 32, 31, 30, 29, 28,
-	27, 26, 25, 24, 23, 22, 21, 20, 19, 18,
-	17, 16, 15, 14, 13, 12, 11, 10, 9, 8
-};
-
-uint8_t tl_c_vmem_reg[100] =
-{
-	127, 127, 127, 127, 123, 120, 117, 115, 113, 111,
-	109, 107, 105, 103, 101, 99, 98, 97, 95, 94,
-	92, 91, 90, 89, 88, 87, 86, 85, 84, 83,
-	82, 81, 80, 79, 78, 77, 76, 75, 74, 73,
-	72, 71, 70, 69, 68, 67, 66, 65, 64, 63,
-	62, 61, 60, 59, 58, 57, 56, 55, 54, 53,
-	52, 51, 50, 49, 48, 47, 46, 45, 44, 43,
-	42, 41, 40, 39, 38, 37, 36, 35, 34, 33,
-	32, 31, 30, 29, 28, 27, 26, 25, 24, 23,
-	22, 21, 20, 19, 18, 17, 16, 15, 14, 13
-};
-
-uint8_t tl_d_vmem_reg[100] =
-{
-	127, 127, 127, 127, 126, 123, 120, 118, 116, 114,
-	112, 110, 108, 106, 104, 102, 101, 100, 98, 97,
-	95, 94, 93, 92, 91, 90, 89, 88, 87, 86,
-	85, 84, 83, 82, 81, 80, 79, 78, 77, 76,
-	75, 74, 73, 72, 71, 70, 69, 68, 67, 66,
-	65, 64, 63, 62, 61, 60, 59, 58, 57, 56,
-	55, 54, 53, 52, 51, 50, 49, 48, 47, 46,
-	45, 44, 43, 42, 41, 40, 39, 38, 37, 36,
-	35, 34, 33, 32, 31, 30, 29, 28, 27, 26,
-	25, 24, 23, 22, 21, 20, 19, 18, 17, 16
-};
-
-/*
- * ALG OP1 OP2 OP3 OP4
- * -------------------
- * 0   a   a   a   a
- * 1   a   a   a   a
- * 2   a   a   a   a
- * 3   a   a   a   a
- * 4   b   a   b   a
- * 5   c   c   c   a
- * 6   c   c   c   a
- * 7   d   d   d   d
- *
- * mind the operator order in VMEM (4-2-3-1)!
- */
-
-uint8_t *tl_alg[8][4] =
-{
-	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
-	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
-	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
-	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
-	{tl_a_vmem_reg, tl_a_vmem_reg, tl_b_vmem_reg, tl_b_vmem_reg},
-	{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
-	{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
-	{tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg}
+	0, 1, 2, 3, 0, 1, 2, 3,
+	0, 1, 0, 2, 3, 0, 1, 2,
+	0, 3, 1, 0, 2, 3, 0, 1,
+	2, 0, 1, 3, 0, 2, 1, 0,
+	3, 2, 0, 1, 0, 3, 2, 1,
+	0, 3, 0, 1, 2, 0, 3, 1,
+	2, 1, 2, 3, 1, 2, 3, 1,
+	2, 3, 1, 2, 3, 2, 3, 3
 };
 
 uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg)
 {
+	uint8_t tl_a_vmem_reg[] =
+	{
+		127, 122, 118, 114, 110, 107, 104, 102, 100, 98,
+		96, 94, 90, 92, 88, 86, 85, 84, 82, 81,
+		79
+	};
+
+	uint8_t tl_b_vmem_reg[] =
+	{
+		127, 127, 126, 122, 118, 115, 112, 110, 108, 106,
+		104, 102, 100, 98, 96, 94, 93, 92, 90, 89,
+		87
+	};
+
+	uint8_t tl_c_vmem_reg[] =
+	{
+		127, 127, 127, 127, 123, 120, 117, 115, 113, 111,
+		109, 107, 105, 103, 101, 99, 98, 97, 95, 94,
+		92
+	};
+
+	uint8_t tl_d_vmem_reg[] =
+	{
+		127, 127, 127, 127, 126, 123, 120, 118, 116, 114,
+		112, 110, 108, 106, 104, 102, 101, 100, 98, 97,
+		95
+	};
+
+	/*
+	 * ALG OP1 OP2 OP3 OP4
+	 * -------------------
+	 * 0   a   a   a   a
+	 * 1   a   a   a   a
+	 * 2   a   a   a   a
+	 * 3   a   a   a   a
+	 * 4   b   a   b   a
+	 * 5   c   c   c   a
+	 * 6   c   c   c   a
+	 * 7   d   d   d   d
+	 *
+	 * mind the operator order in VMEM (4-2-3-1)!
+	 */
+
+	uint8_t *tl_alg[8][4] =
+	{
+		{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+		{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+		{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+		{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+		{tl_a_vmem_reg, tl_a_vmem_reg, tl_b_vmem_reg, tl_b_vmem_reg},
+		{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
+		{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
+		{tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg}
+	};
+
 	if (vmem_tl < 20)
 	{
 		return tl_alg[vmem_alg][op][vmem_tl];
 	}
 	else
 	{
-		return tl_alg[vmem_alg][op][20] + (vmem_tl - 20);
+		return tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
+	}
+}
+
+uint8_t lfo(uint8_t speed, uint8_t waveform)
+{
+	uint8_t lfo_vmem_reg[100] =
+	{
+		0, 31, 74, 89, 106, 114, 125, 133, 138, 144,
+		148, 153, 157, 161, 165, 167, 171, 173, 176, 178,
+		181, 184, 185, 188, 189, 191, 194, 195, 197, 198,
+		200, 201, 203, 205, 206, 207, 208, 210, 211, 212,
+		213, 214, 216, 217, 218, 219, 220, 221, 222, 223,
+		223, 225, 226, 226, 227, 228, 229, 230, 231, 231,
+		232, 233, 234, 234, 235, 236, 237, 237, 238, 238,
+		239, 240, 240, 241, 242, 242, 243, 244, 244, 245,
+		246, 246, 247, 247, 248, 249, 249, 250, 250, 251,
+		251, 252, 252, 253, 253, 253, 254, 255, 255, 255
+	};
+
+	uint8_t lfo_sh_vmem_reg[100] =
+	{
+		0, 2, 5, 7, 10, 12, 15, 18, 20, 23,
+		25, 28, 30, 33, 36, 38, 41, 43, 46, 48,
+		51, 54, 56, 59, 61, 64, 67, 69, 72, 74,
+		77, 79, 82, 85, 87, 90, 92, 95, 97, 100,
+		103, 105, 108, 110, 113, 116, 118, 121, 123, 126,
+		128, 131, 134, 136, 139, 141, 144, 146, 149, 152,
+		154, 157, 159, 162, 165, 167, 170, 172, 175, 177,
+		180, 183, 185, 188, 190, 193, 195, 198, 201, 203,
+		206, 208, 211, 213, 216, 219, 221, 224, 226, 229,
+		232, 234, 237, 239, 242, 244, 247, 250, 252, 255
+	};
+
+	if (waveform == 3)
+	{
+		return lfo_sh_vmem_reg[speed];
+	}
+	else
+	{
+		return lfo_vmem_reg[speed];
 	}
 }
 
@@ -234,7 +241,19 @@ void wait(uint8_t loop)
 	}
 }
 
+static void setreg2(uint8_t reg, uint8_t data)
+{
+	setreg3(reg, data);
+	yamaha2[reg] = data;
+}
+
 static void setreg(uint8_t reg, uint8_t data)
+{
+	setreg3(reg, data);
+	yamaha[reg] = data;
+}
+
+static void setreg3(uint8_t reg, uint8_t data)
 {
 	uint8_t ym_busy = 1;
 
@@ -311,19 +330,38 @@ void setup()
 	{
 		setreg(0x08, 0x00 + j);	// Key OFF channel j
 	}
-	// Serial.begin(9600);
+	/*
+		Serial.begin(9600);
+
+		for (uint16_t i = 0; i <= 255; i++)
+		{
+			Serial.print("0x");
+			Serial.print(i, HEX);
+			Serial.print(" = 0x");
+			Serial.print(yamaha[i], HEX);
+			if (((i >= 0x40) && (i <= 0x5f)) || ((i >= 0x80) && (i <= 0x9f)) || ((i >= 0xc0) && (i <= 0xdf)))
+			{
+				Serial.print(" / 0x");
+				Serial.print(yamaha2[i], HEX);
+			}
+			Serial.println();
+		}
+		delay(100000);
+	*/
 }
 
 void loop()
 {
+
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		set_note(i, 37);
-		delay(1000);
+		set_note(i, 24 + i);
+		delay(300);
 		unset_note(i);
-		delay(1000);
+		delay(300);
 	}
-	delay(3000);
+	delay(1000);
+
 //load_patch(0);
 //process_encoders();
 //update_display();
@@ -334,25 +372,23 @@ void load_patch(uint16_t i)
 {
 	unsigned char data[84] =
 	{
-		0x0B, 0x04, 0x05, 0x04, 0x0F, 0x00, 0x42, 0x55, 0x22, 0x06, 0x0A, 0x07, 0x04, 0x04, 0x0F, 0x00,
-		0x02, 0x47, 0x0A, 0x00, 0x0B, 0x1F, 0x02, 0x04, 0x0F, 0x00, 0x02, 0x63, 0x0D, 0x06, 0x0B, 0x1F,
-		0x02, 0x05, 0x0F, 0x00, 0x02, 0x62, 0x04, 0x00, 0x1C, 0x1E, 0x06, 0x11, 0x09, 0x5A, 0x0C, 0x04,
-		0x04, 0x00, 0x63, 0x28, 0x00, 0x00, 0x00, 0x32, 0x00, 0x42, 0x6F, 0x77, 0x65, 0x64, 0x42, 0x65,
-		0x6C, 0x6C, 0x20, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
-		0x00, 0x04, 0x00, 0x00
+		0x1F, 0x09, 0x09, 0x0F, 0x0C, 0x27, 0x02, 0x35, 0x37, 0x10, 0x1F, 0x04, 0x03, 0x04, 0x0D, 0x19,
+		0x04, 0x56, 0x05, 0x16, 0x1F, 0x0F, 0x08, 0x0D, 0x0C, 0x00, 0x43, 0x60, 0x04, 0x0E, 0x1F, 0x0C,
+		0x03, 0x07, 0x0E, 0x00, 0x43, 0x63, 0x05, 0x10, 0x3C, 0x14, 0x08, 0x02, 0x1B, 0x56, 0x05, 0x02,
+		0x04, 0x00, 0x63, 0x32, 0x00, 0x00, 0x00, 0x32, 0x00, 0x4C, 0x6F, 0x54, 0x69, 0x6E, 0x65, 0x38,
+		0x31, 0x5A, 0x20, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x7F, 0x00, 0x01, 0x00, 0x18, 0x00,
+		0x01, 0x00, 0x00, 0x00
 	};
 	memcpy(&voice, data, 84);
 
-
-
-	//setreg(0x16, lfo_vmem_reg[voice.lfs]);														// UNUSED !!! LFRQ2 = LFO2 Speed
-	//setreg(0x17, amd_vmem_reg[voice.amd]);														// AMD2 = LFO2 Amplitude Modulation Depth
-	//setreg(0x17, 0x80 | pmd_vmem_reg[voice.pmd]);												// PMD2 = LFO2 Pitch Modulation Depth
-	setreg(0x18, lfo_vmem_reg[voice.lfs]);															// LFRQ1 = LFO1 Speed
+//setreg(0x16, lfo_vmem_reg[voice.lfs]);														// UNUSED !!! LFRQ2 = LFO2 Speed
+//setreg(0x17, amd_vmem_reg[voice.amd]);														// AMD2 = LFO2 Amplitude Modulation Depth
+//setreg(0x17, 0x80 | pmd_vmem_reg[voice.pmd]);													// PMD2 = LFO2 Pitch Modulation Depth
+	setreg(0x18, lfo(voice.lfs, (voice.pms_ams_lfw & 0x03)));										// LFRQ1 = LFO1 Speed
 	setreg(0x19, amd_vmem_reg[voice.amd]);															// AMD1 = LFO1 Amplitude Modulation Depth
-	setreg(0x19, 0x80 | pmd_vmem_reg[voice.pmd]);													// PMD1 = LFO1 Pitch Modulation Depth
-	//setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
-	//       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));							// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
+	setreg2(0x19, 0x80 | pmd_vmem_reg[voice.pmd]);													// PMD1 = LFO1 Pitch Modulation Depth
+//setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
+//       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));						// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
 	setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
 
 	for (uint8_t j = 0; j < 8; j++)																	// we support only single mode => iterate settings across all 8 channels
@@ -375,21 +411,23 @@ void load_patch(uint16_t i)
 				{
 					dt1_local = (7 - (voice.op[k].rs_det & 0x07));
 				}
-				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | ((voice.op[k].f & 0x3c) >> 2));		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
+				//setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | ((voice.op[k].f & 0x3c) >> 2));		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
+				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | mul_vmem_reg[voice.op[k].f]);		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
 			}
 			else																					// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-					   ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+				       ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
-			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
-			//setreg(0x60 + j + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
+			setreg2(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
+			setreg(0x60 + j + 0x08 * k, tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07)));			// TL = Operator output level
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |						// KRS + FIX + AR = Key rate scaling ...
-				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
+			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
-			setreg(0xc0 + j + 0x08 * k, ((voice.op[k].f & 0x03) << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
-			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
-				   voice.rev);																		// ... + reverb rate
+			//setreg(0xc0 + j + 0x08 * k, ((voice.op[k].f & 0x03) << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
+			setreg(0xc0 + j + 0x08 * k, (dt2_vmem_reg[voice.op[k].f] << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
+			setreg2(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
+			        voice.rev);																		// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);			// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
@@ -413,7 +451,7 @@ void set_note(uint8_t channel, uint8_t midi_note)
 
 		for (uint8_t k = 0; k < 4; k++)
 		{
-			//setreg(0x60 + channel + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
+			setreg(0x60 + channel + 0x08 * k, (tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07))));							// TL = Operator output level
 		}
 
 		setreg(0x28 + channel, (octave << 4) | note);					// Set channel note

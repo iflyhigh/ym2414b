@@ -197,7 +197,32 @@ uint8_t tl_d_vmem_reg[100] =
  * 6   c   c   c   a
  * 7   d   d   d   d
  *
+ * mind the operator order in VMEM (4-2-3-1)!
  */
+
+uint8_t *tl_alg[8][4] =
+{
+	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+	{tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg, tl_a_vmem_reg},
+	{tl_a_vmem_reg, tl_a_vmem_reg, tl_b_vmem_reg, tl_b_vmem_reg},
+	{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
+	{tl_a_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg, tl_c_vmem_reg},
+	{tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg, tl_d_vmem_reg}
+};
+
+uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg)
+{
+	if (vmem_tl < 20)
+	{
+		return tl_alg[vmem_alg][op][vmem_tl];
+	}
+	else
+	{
+		return tl_alg[vmem_alg][op][20] + (vmem_tl - 20);
+	}
+}
 
 void wait(uint8_t loop)
 {
@@ -358,7 +383,7 @@ void load_patch(uint16_t i)
 					   ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
-			setreg(0x60 + j + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
+			//setreg(0x60 + j + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |						// KRS + FIX + AR = Key rate scaling ...
 				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
@@ -388,7 +413,7 @@ void set_note(uint8_t channel, uint8_t midi_note)
 
 		for (uint8_t k = 0; k < 4; k++)
 		{
-			setreg(0x60 + channel + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
+			//setreg(0x60 + channel + 0x08 * k, (tl_vmem_reg[voice.op[k].out]));							// TL = Operator output level
 		}
 
 		setreg(0x28 + channel, (octave << 4) | note);					// Set channel note

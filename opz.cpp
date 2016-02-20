@@ -68,6 +68,24 @@ uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint
 	uint8_t _kls = 0;
 	uint8_t _note = 0;
 
+	Serial.println("----------------------");
+	Serial.println();
+	Serial.print("tl(");
+	Serial.print(op);
+	Serial.print(", ");
+	Serial.print(vmem_tl);
+	Serial.print(", ");
+	Serial.print(vmem_alg);
+	Serial.print(", ");
+	Serial.print(vmem_kvs);
+	Serial.print(", ");
+	Serial.print(vmem_kls);
+	Serial.print(", ");
+	Serial.print(opz_note);
+	Serial.print(", ");
+	Serial.print(midi_velocity);
+	Serial.println(");");
+
 	if (vmem_tl < 21)
 	{
 		_tl = tl_alg[vmem_alg][op][vmem_tl];
@@ -77,34 +95,58 @@ uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint
 		_tl = tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
 	}
 
-	if (vmem_kls > 0)
-	{
-		uint8_t _opz_note;
-		_opz_note = (opz_note & 0x0f);
-		if (_opz_note > 10) { _opz_note--; }
-		if (_opz_note > 7) { _opz_note--; }
-		_note = (opz_note >> 4) * 10 + _opz_note;
-	}
+	//if (vmem_kls > 0)
+	//{
+	uint8_t _opz_note;
+	_opz_note = (opz_note & 0x0f);
+	if (_opz_note > 10) { _opz_note--; }
+	if (_opz_note > 7) { _opz_note--; }
+	if (_opz_note > 2) { _opz_note--; }
+	_note = (opz_note >> 4) * 10 + _opz_note;
+	//}
+
+	Serial.print("_note = ");
+	Serial.println(_note);
 
 	if (vmem_kvs > 0)
 	{
-		_kvs = pgm_read_byte(kvs[vmem_kvs][127 - midi_velocity]);
+		_kvs = pgm_read_byte(&kvs[vmem_kvs - 1][127 - midi_velocity]);
 		if ((_note > 0) && (vmem_kls > 0))
 		{
-			_kls = pgm_read_byte(kls_kvs17[vmem_kls][_note]);
+			_kls = pgm_read_byte(&kls_kvs17[vmem_kls - 1][_note]);
+		}
+		else
+		{
+			_kls = 0;
 		}
 	}
 	else
 	{
-		// _kvs = 0
+		_kvs = 0;
 		if ((_note > 0) && (vmem_kls > 0))
 		{
-			_kls = pgm_read_byte(kls_kvs0[vmem_kls][_note]);
+			_kls = pgm_read_byte(&kls_kvs0[vmem_kls - 1][_note]);
+		}
+		else
+		{
+			_kls = 0;
 		}
 	}
 
+	Serial.print("_tl = ");
+	Serial.println(_tl);
+	Serial.print("_kvs = ");
+	Serial.println(_kvs);
+	Serial.print("_kls = ");
+	Serial.println(_kls);
+
+
 	_tl = _tl + _kvs + _kls;
 	if (_tl > 127) { _tl = 127; }
+
+	Serial.print("TL = ");
+	Serial.println(_tl);
+
 
 	return (uint8_t)_tl;
 
@@ -126,12 +168,12 @@ void load_patch(uint16_t i)
 {
 	unsigned char data[84] =
 	{
-		0x1F, 0x09, 0x09, 0x0F, 0x0C, 0x27, 0x02, 0x35, 0x37, 0x10, 0x1F, 0x04, 0x03, 0x04, 0x0D, 0x19,
-		0x04, 0x56, 0x05, 0x16, 0x1F, 0x0F, 0x08, 0x0D, 0x0C, 0x00, 0x43, 0x60, 0x04, 0x0E, 0x1F, 0x0C,
-		0x03, 0x07, 0x0E, 0x00, 0x43, 0x63, 0x05, 0x10, 0x3C, 0x14, 0x08, 0x02, 0x1B, 0x56, 0x05, 0x02,
-		0x04, 0x00, 0x63, 0x32, 0x00, 0x00, 0x00, 0x32, 0x00, 0x4C, 0x6F, 0x54, 0x69, 0x6E, 0x65, 0x38,
-		0x31, 0x5A, 0x20, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x7F, 0x00, 0x01, 0x00, 0x18, 0x00,
-		0x01, 0x00, 0x00, 0x00
+		0x1D, 0x04, 0x0C, 0x06, 0x00, 0x34, 0x01, 0x4D, 0x04, 0x0D, 0x1F, 0x07, 0x03, 0x06, 0x0C, 0x5E,
+		0x04, 0x4D, 0x0D, 0x0B, 0x18, 0x05, 0x03, 0x06, 0x00, 0x3D, 0x01, 0x4A, 0x16, 0x18, 0x1F, 0x08,
+		0x03, 0x06, 0x0D, 0x00, 0x01, 0x63, 0x04, 0x13, 0x3A, 0x23, 0x00, 0x00, 0x00, 0x02, 0x0C, 0x02,
+		0x04, 0x00, 0x63, 0x32, 0x00, 0x00, 0x00, 0x32, 0x00, 0x47, 0x72, 0x61, 0x6E, 0x64, 0x50, 0x69,
+		0x61, 0x6E, 0x6F, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+		0x00, 0x00, 0x00, 0x00
 	};
 	memcpy(&voice, data, 84);
 
@@ -170,15 +212,15 @@ void load_patch(uint16_t i)
 			else																						// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-					   ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+				       ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);									// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |							// KRS + FIX + AR = Key rate scaling ...
-				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
+			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);			// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
 			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |			// EGS + REV = EG shift + 1 magic bit + ...
-				   voice.rev);																			// ... + reverb rate
+			       voice.rev);																			// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
@@ -203,7 +245,7 @@ void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
 		for (uint8_t k = 0; k < 4; k++)
 		{
 			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
-												   (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, opz_note, midi_velocity)));
+			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, (opz_octave << 4) | opz_note, midi_velocity)));
 		}
 
 		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note

@@ -40,9 +40,9 @@ void setup()
 	{
 		setreg(0x08, 0x00 + j);	// Key OFF channel j
 	}
-	/*
-	Serial.begin(9600);
 
+	Serial.begin(9600);
+	/*
 	for (uint16_t i = 0; i <= 255; i++)
 	{
 	Serial.print("0x");
@@ -65,12 +65,12 @@ void loop()
 
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		set_note(i, 24 + i, 81);
+		set_note(i, 25 + i, 81);
 		delay(300);
 		unset_note(i);
 		delay(300);
 	}
-	delay(1000);
+	delay(1000000);
 
 	//load_patch(0);
 	//process_encoders();

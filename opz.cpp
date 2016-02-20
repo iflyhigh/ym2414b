@@ -5,6 +5,9 @@
 #include "types.h"
 #include "tables.h"
 
+#define SET_NOTE_OK 1
+#define SET_NOTE_NOT_IN_RANGE 0
+
 voice_t voice;
 
 void wait(uint8_t loop)
@@ -61,12 +64,11 @@ void setreg(uint8_t reg, uint8_t data)
 	wait(60);
 }
 
-uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t opz_note, uint8_t midi_velocity)
+uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t seq_note, uint8_t seq_velocity)
 {
 	uint16_t _tl;
 	uint8_t _kvs = 0;
 	uint8_t _kls = 0;
-	uint8_t _note = 0;
 
 	Serial.println("----------------------");
 	Serial.println();
@@ -81,9 +83,9 @@ uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint
 	Serial.print(", ");
 	Serial.print(vmem_kls);
 	Serial.print(", ");
-	Serial.print(opz_note);
+	Serial.print(seq_note);
 	Serial.print(", ");
-	Serial.print(midi_velocity);
+	Serial.print(seq_velocity);
 	Serial.println(");");
 
 	if (vmem_tl < 21)
@@ -95,41 +97,19 @@ uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint
 		_tl = tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
 	}
 
-	//if (vmem_kls > 0)
-	//{
-	uint8_t _opz_note;
-	_opz_note = (opz_note & 0x0f);
-	if (_opz_note > 10) { _opz_note--; }
-	if (_opz_note > 7) { _opz_note--; }
-	if (_opz_note > 2) { _opz_note--; }
-	_note = (opz_note >> 4) * 10 + _opz_note;
-	//}
-
-	Serial.print("_note = ");
-	Serial.println(_note);
-
 	if (vmem_kvs > 0)
 	{
-		_kvs = pgm_read_byte(&kvs[vmem_kvs - 1][127 - midi_velocity]);
-		if ((_note > 0) && (vmem_kls > 0))
+		_kvs = pgm_read_byte(&kvs[vmem_kvs - 1][127 - seq_velocity]);
+		if ((seq_note > 20) && (vmem_kls > 0))
 		{
-			_kls = pgm_read_byte(&kls_kvs17[vmem_kls - 1][_note]);
-		}
-		else
-		{
-			_kls = 0;
+			_kls = pgm_read_byte(&kls_kvs17[vmem_kls - 1][(seq_note / 3) - 1]);
 		}
 	}
 	else
 	{
-		_kvs = 0;
-		if ((_note > 0) && (vmem_kls > 0))
+		if ((seq_note > 17) && (vmem_kls > 0))
 		{
-			_kls = pgm_read_byte(&kls_kvs0[vmem_kls - 1][_note]);
-		}
-		else
-		{
-			_kls = 0;
+			_kls = pgm_read_byte(&kls_kvs0[vmem_kls - 1][(seq_note / 3) - 1]);
 		}
 	}
 
@@ -212,21 +192,21 @@ void load_patch(uint16_t i)
 			else																						// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-				       ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+					   ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);									// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |							// KRS + FIX + AR = Key rate scaling ...
-			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
+				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);			// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
 			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |			// EGS + REV = EG shift + 1 magic bit + ...
-			       voice.rev);																			// ... + reverb rate
+				   voice.rev);																			// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
 }
 
-void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
+uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity)
 {
 	uint8_t opz_octave;
 	uint8_t opz_note;
@@ -234,7 +214,9 @@ void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
 	// YM2414B supports 8 ocataves (0-7) each starting with C# and ending with C
 	// A4 = 440Hz according to YM2151 application notes (2.1.2) && MIDI A4 = 440Hz
 
-	if ((midi_note > 0) && (midi_note < 97))						// ignore notes that are not supported by YM2151
+	midi_note = midi_note + (24 - voice.transpose) - 12;	// TRPS = transpose according to middle C, shift by 12 down for simpler calculations
+
+	if ((midi_note > 0) && (midi_note < 97))				// ignore notes that are not supported by YM2414B. TX81z wraps notes, we'll do better
 	{
 		opz_octave = (midi_note - 1) / 12;
 		opz_note = (midi_note - 1) % 12;
@@ -245,12 +227,18 @@ void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
 		for (uint8_t k = 0; k < 4; k++)
 		{
 			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
-			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, (opz_octave << 4) | opz_note, midi_velocity)));
+												   (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, midi_velocity)));
 		}
 
 		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note
 		setreg(0x30 + channel, (opz_fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
 		setreg(0x08, 0x78 | channel);										// Key ON for channel (all 4 OPs are running)
+
+		return SET_NOTE_OK;
+	}
+	else
+	{
+		return SET_NOTE_NOT_IN_RANGE;
 	}
 }
 

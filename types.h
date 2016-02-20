@@ -29,7 +29,7 @@ struct voice_t
 	uint8_t	pmd;
 	uint8_t	amd;
 	uint8_t	pms_ams_lfw;
-	uint8_t	trps;
+	uint8_t	transpose;
 	uint8_t	pbr;
 	uint8_t	ch_mo_su_po_pm;
 	uint8_t	port;

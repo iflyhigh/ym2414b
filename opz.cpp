@@ -188,17 +188,17 @@ void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
 {
 	uint8_t opz_octave;
 	uint8_t opz_note;
-	uint8_t opz_fraction = 0xf1;	// measured !
-	// For some reason YM2414B supports 8 ocataves (0-7) each starting with C# and ending with C
-	// A4 = 440Hz according to application notes (2.1.2) && MIDI A4 = 440Hz => we support MIDI notes
-	// from 1 to 96 inclusive and ignore others
+	uint8_t opz_fraction = 0xf1;	// no microtuning at this time
+	// YM2414B supports 8 ocataves (0-7) each starting with C# and ending with C
+	// A4 = 440Hz according to YM2151 application notes (2.1.2) && MIDI A4 = 440Hz
+
 	if ((midi_note > 0) && (midi_note < 97))						// ignore notes that are not supported by YM2151
 	{
 		opz_octave = (midi_note - 1) / 12;
 		opz_note = (midi_note - 1) % 12;
-		if (opz_note > 2) {opz_note++;};									// YM2414B note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
-		if (opz_note > 6) {opz_note++;};									// Why?
-		if (opz_note > 10) {opz_note++;};									// Because we can! :)
+		if (opz_note > 2) { opz_note++; }									// YM2414B note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
+		if (opz_note > 6) { opz_note++; }
+		if (opz_note > 10) { opz_note++; }
 
 		for (uint8_t k = 0; k < 4; k++)
 		{

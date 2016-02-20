@@ -1,5 +1,8 @@
 // some code grabbed from YM2151 Library, see http://www.ooishoo.org/?page_id=15
 // see http://sr4.sakura.ne.jp/fmsound/opz.html for YM2414B register analysis
+#define __PROG_TYPES_COMPAT__
+#include <avr/pgmspace.h>
+
 #include "opz.h"
 #include "types.h"
 
@@ -62,7 +65,7 @@ void loop()
 
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		set_note(i, 24 + i);
+		set_note(i, 24 + i, 81);
 		delay(300);
 		unset_note(i);
 		delay(300);

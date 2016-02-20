@@ -1,8 +1,10 @@
+#define __PROG_TYPES_COMPAT__
+#include <avr/pgmspace.h>
 #include "Arduino.h"
 #include "tables.h"
 
 // KLS adjustments for KVS=0, starting fron KLS=1
-uint8_t kls_kvs0[99][32] =
+const prog_uchar PROGMEM kls_kvs0[99][32] =
 {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2},
@@ -106,7 +108,7 @@ uint8_t kls_kvs0[99][32] =
 };
 
 // KLS TL adjustments for KVS=1..7, starting fron KLS=1
-uint8_t kls_kvs17[99][32] =
+const prog_uchar PROGMEM kls_kvs17[99][32] =
 {
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1},
 	{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2},
@@ -210,7 +212,7 @@ uint8_t kls_kvs17[99][32] =
 };
 
 // KVS adjustments, starting from KVS=1
-uint8_t kvs[7][128] =
+const prog_uchar PROGMEM kvs[7][128] =
 {
 	{
 		6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
@@ -284,7 +286,7 @@ uint8_t kvs[7][128] =
 	}
 };
 
-uint8_t lfo_other[100] =
+const prog_uchar PROGMEM lfo_other[100] =
 {
 	0, 31, 74, 89, 106, 114, 125, 133, 138, 144,
 	148, 153, 157, 161, 165, 167, 171, 173, 176, 178,
@@ -298,7 +300,7 @@ uint8_t lfo_other[100] =
 	251, 252, 252, 253, 253, 253, 254, 255, 255, 255
 };
 
-uint8_t lfo_sh[100] =
+const prog_uchar PROGMEM lfo_sh[100] =
 {
 	0, 2, 5, 7, 10, 12, 15, 18, 20, 23,
 	25, 28, 30, 33, 36, 38, 41, 43, 46, 48,
@@ -312,27 +314,54 @@ uint8_t lfo_sh[100] =
 	232, 234, 237, 239, 242, 244, 247, 250, 252, 255
 };
 
-uint8_t basic_tl_a[] =
+const uint8_t basic_tl_a[21] =
 {
 	127, 122, 118, 114, 110, 107, 104, 102, 100, 98, 96, 94, 90, 92, 88, 86, 85, 84, 82, 81, 79
 };
 
-uint8_t basic_tl_b[] =
+const uint8_t basic_tl_b[21] =
 {
 	127, 127, 126, 122, 118, 115, 112, 110, 108, 106, 104, 102, 100, 98, 96, 94, 93, 92, 90, 89, 87
 };
 
-uint8_t basic_tl_c[] =
+const uint8_t basic_tl_c[21] =
 {
 	127, 127, 127, 127, 123, 120, 117, 115, 113, 111, 109, 107, 105, 103, 101, 99, 98, 97, 95, 94, 92
 };
 
-uint8_t basic_tl_d[] =
+const uint8_t basic_tl_d[21] =
 {
 	127, 127, 127, 127, 126, 123, 120, 118, 116, 114, 112, 110, 108, 106, 104, 102, 101, 100, 98, 97, 95
 };
 
-uint8_t pmd[100] =
+/*
+* ALG OP1 OP2 OP3 OP4
+* -------------------
+* 0   a   a   a   a
+* 1   a   a   a   a
+* 2   a   a   a   a
+* 3   a   a   a   a
+* 4   b   a   b   a
+* 5   c   c   c   a
+* 6   c   c   c   a
+* 7   d   d   d   d
+*
+* mind the operator order in VMEM (4-2-3-1)!
+*/
+
+const uint8_t *tl_alg[8][4] =
+{
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
+	{basic_tl_a, basic_tl_a, basic_tl_b, basic_tl_b},
+	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
+	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
+	{basic_tl_d, basic_tl_d, basic_tl_d, basic_tl_d}
+};
+
+const prog_uchar PROGMEM pmd[100] =
 {
 	0,  0,  2,  3,  4,  5,  7,  8,  9, 11,
 	12, 13, 14, 16, 17, 18, 20, 21, 22, 23,
@@ -346,7 +375,7 @@ uint8_t pmd[100] =
 	115, 116, 118, 119, 120, 121, 123, 124, 125, 127
 };
 
-uint8_t amd[100] =
+const prog_uchar PROGMEM amd[100] =
 {
 	0,  0,  0,  0,  0,  1,  1,  1,  1,  2,
 	2,  2,  2,  3,  3,  3,  3,  4,  4,  4,
@@ -360,7 +389,7 @@ uint8_t amd[100] =
 	54, 56, 60, 62, 67, 70, 77, 86, 96, 127
 };
 
-uint8_t mul[64] =
+const prog_uchar PROGMEM mul[64] =
 {
 	0, 0, 0, 0, 1, 1, 1, 1,
 	2, 2, 3, 2, 2, 4, 3, 3,
@@ -372,7 +401,7 @@ uint8_t mul[64] =
 	13,	12, 15, 14, 13, 15, 14, 15
 };
 
-uint8_t dt2[64] =
+const prog_uchar PROGMEM dt2[64] =
 {
 	0, 1, 2, 3, 0, 1, 2, 3,
 	0, 1, 0, 2, 3, 0, 1, 2,

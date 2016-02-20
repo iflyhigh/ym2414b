@@ -1,3 +1,5 @@
+#define __PROG_TYPES_COMPAT__
+#include <avr/pgmspace.h>
 #include <Arduino.h>
 #include "opz.h"
 #include "types.h"
@@ -59,54 +61,64 @@ void setreg(uint8_t reg, uint8_t data)
 	wait(60);
 }
 
-uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg)
+uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t opz_note, uint8_t midi_velocity)
 {
-	/*
-	* ALG OP1 OP2 OP3 OP4
-	* -------------------
-	* 0   a   a   a   a
-	* 1   a   a   a   a
-	* 2   a   a   a   a
-	* 3   a   a   a   a
-	* 4   b   a   b   a
-	* 5   c   c   c   a
-	* 6   c   c   c   a
-	* 7   d   d   d   d
-	*
-	* mind the operator order in VMEM (4-2-3-1)!
-	*/
+	uint16_t _tl;
+	uint8_t _kvs = 0;
+	uint8_t _kls = 0;
+	uint8_t _note = 0;
 
-	uint8_t *tl_alg[8][4] =
+	if (vmem_tl < 21)
 	{
-		{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-		{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-		{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-		{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-		{basic_tl_a, basic_tl_a, basic_tl_b, basic_tl_b},
-		{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
-		{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
-		{basic_tl_d, basic_tl_d, basic_tl_d, basic_tl_d}
-	};
-
-	if (vmem_tl < 20)
-	{
-		return tl_alg[vmem_alg][op][vmem_tl];
+		_tl = tl_alg[vmem_alg][op][vmem_tl];
 	}
 	else
 	{
-		return tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
+		_tl = tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
 	}
+
+	if (vmem_kls > 0)
+	{
+		uint8_t _opz_note;
+		_opz_note = (opz_note & 0x0f);
+		if (_opz_note > 10) { _opz_note--; }
+		if (_opz_note > 7) { _opz_note--; }
+		_note = (opz_note >> 4) * 10 + _opz_note;
+	}
+
+	if (vmem_kvs > 0)
+	{
+		_kvs = pgm_read_byte(kvs[vmem_kvs][127 - midi_velocity]);
+		if ((_note > 0) && (vmem_kls > 0))
+		{
+			_kls = pgm_read_byte(kls_kvs17[vmem_kls][_note]);
+		}
+	}
+	else
+	{
+		// _kvs = 0
+		if ((_note > 0) && (vmem_kls > 0))
+		{
+			_kls = pgm_read_byte(kls_kvs0[vmem_kls][_note]);
+		}
+	}
+
+	_tl = _tl + _kvs + _kls;
+	if (_tl > 127) { _tl = 127; }
+
+	return (uint8_t)_tl;
+
 }
 
 uint8_t lfo(uint8_t speed, uint8_t waveform)
 {
 	if (waveform == 3)
 	{
-		return lfo_sh[speed];
+		return pgm_read_byte(lfo_sh[speed]);
 	}
 	else
 	{
-		return lfo_other[speed];
+		return pgm_read_byte(lfo_other[speed]);
 	}
 }
 
@@ -127,8 +139,8 @@ void load_patch(uint16_t i)
 	//setreg(0x17, amd_vmem_reg[voice.amd]);														// AMD2 = LFO2 Amplitude Modulation Depth
 	//setreg(0x17, 0x80 | pmd_vmem_reg[voice.pmd]);													// PMD2 = LFO2 Pitch Modulation Depth
 	setreg(0x18, lfo(voice.lfs, (voice.pms_ams_lfw & 0x03)));										// LFRQ1 = LFO1 Speed
-	setreg(0x19, amd[voice.amd]);															// AMD1 = LFO1 Amplitude Modulation Depth
-	setreg(0x19, 0x80 | pmd[voice.pmd]);													// PMD1 = LFO1 Pitch Modulation Depth
+	setreg(0x19, pgm_read_byte(amd[voice.amd]));													// AMD1 = LFO1 Amplitude Modulation Depth
+	setreg(0x19, 0x80 | pgm_read_byte(pmd[voice.pmd]));												// PMD1 = LFO1 Pitch Modulation Depth
 	//setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
 	//       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));						// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
 	setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
@@ -153,52 +165,50 @@ void load_patch(uint16_t i)
 				{
 					dt1_local = (7 - (voice.op[k].rs_det & 0x07));
 				}
-				//setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | ((voice.op[k].f & 0x3c) >> 2));		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
-				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | mul[voice.op[k].f]);		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
+				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | pgm_read_byte(mul[voice.op[k].f]));		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
 			}
-			else																					// FIX mode
+			else																						// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-					   ((voice.op[k].f & 0x3c) >> 2));												// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+					   ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
-			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);								// OW + FINE = Oscillator waveform + fine frequency tuning
-			setreg(0x60 + j + 0x08 * k, tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07)));			// TL = Operator output level
-			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |						// KRS + FIX + AR = Key rate scaling ...
-				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );		// ... + fix/ratio mode + operator attack rate
-			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
-			//setreg(0xc0 + j + 0x08 * k, ((voice.op[k].f & 0x03) << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
-			setreg(0xc0 + j + 0x08 * k, (dt2[voice.op[k].f] << 6) | voice.op[k].d2r);			// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
-			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |		// EGS + REV = EG shift + 1 magic bit + ...
-				   voice.rev);																		// ... + reverb rate
-			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);			// D1L + RR = Operator Decay 1 Level + Release Rate
+			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);									// OW + FINE = Oscillator waveform + fine frequency tuning
+			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |							// KRS + FIX + AR = Key rate scaling ...
+				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
+			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);			// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
+			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
+			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |			// EGS + REV = EG shift + 1 magic bit + ...
+				   voice.rev);																			// ... + reverb rate
+			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
 }
 
-void set_note(uint8_t channel, uint8_t midi_note)
+void set_note(uint8_t channel, uint8_t midi_note, uint8_t midi_velocity)
 {
-	uint8_t octave;
-	uint8_t note;
-	uint8_t fraction = 0xf1;	// measured !
+	uint8_t opz_octave;
+	uint8_t opz_note;
+	uint8_t opz_fraction = 0xf1;	// measured !
 	// For some reason YM2414B supports 8 ocataves (0-7) each starting with C# and ending with C
 	// A4 = 440Hz according to application notes (2.1.2) && MIDI A4 = 440Hz => we support MIDI notes
 	// from 1 to 96 inclusive and ignore others
 	if ((midi_note > 0) && (midi_note < 97))						// ignore notes that are not supported by YM2151
 	{
-		octave = (midi_note - 1) / 12;
-		note = (midi_note - 1) % 12;
-		if (note > 2) {note++;};									// YM2414B note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
-		if (note > 6) {note++;};									// Why?
-		if (note > 10) {note++;};									// Because we can! :)
+		opz_octave = (midi_note - 1) / 12;
+		opz_note = (midi_note - 1) % 12;
+		if (opz_note > 2) {opz_note++;};									// YM2414B note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
+		if (opz_note > 6) {opz_note++;};									// Why?
+		if (opz_note > 10) {opz_note++;};									// Because we can! :)
 
 		for (uint8_t k = 0; k < 4; k++)
 		{
-			setreg(0x60 + channel + 0x08 * k, (tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07))));							// TL = Operator output level
+			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
+												   (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, opz_note, midi_velocity)));
 		}
 
-		setreg(0x28 + channel, (octave << 4) | note);					// Set channel note
-		setreg(0x30 + channel, (fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
-		setreg(0x08, 0x78 | channel);									// Key ON for channel (all 4 OPs are running)
+		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note
+		setreg(0x30 + channel, (opz_fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
+		setreg(0x08, 0x78 | channel);										// Key ON for channel (all 4 OPs are running)
 	}
 }
 

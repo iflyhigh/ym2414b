@@ -1,3 +1,5 @@
+
+
 struct 	op_t	// FM operator settings
 {
 	uint8_t	ar;
@@ -5,7 +7,7 @@ struct 	op_t	// FM operator settings
 	uint8_t	d2r;
 	uint8_t	rr;
 	uint8_t	d1l;
-	uint8_t	ls;
+	uint8_t	kls;
 	uint8_t	ame_ebs_kvs;
 	uint8_t	out;
 	uint8_t	f;

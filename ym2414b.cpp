@@ -63,9 +63,11 @@ void setup()
 void loop()
 {
 
-	for (uint8_t i = 0; i < 8; i++)
+	uint8_t notes[] = {0, 2, 4, 5, 7, 9, 11};
+
+	for (uint8_t i = 0; i < 7; i++)
 	{
-		set_note(i, 64 + i, 93);
+		set_note(i, 48 + notes[i], 123);
 		delay(300);
 		unset_note(i);
 		delay(300);

@@ -321,26 +321,32 @@ const uint8_t basic_tl_a[21] =
 
 const uint8_t basic_tl_b[21] =
 {
-	127, 127, 126, 122, 118, 115, 112, 110, 108, 106, 104, 102, 100, 98, 96, 94, 93, 92, 90, 89, 87
+	127, 127, 127, 127, 127, 127, 127, 127, 123, 121, 119, 117, 115, 113, 111, 109, 108, 107, 105, 104, 102
 };
 
 const uint8_t basic_tl_c[21] =
 {
-	127, 127, 127, 127, 123, 120, 117, 115, 113, 111, 109, 107, 105, 103, 101, 99, 98, 97, 95, 94, 92
+	127, 127, 127, 127, 127, 127, 127, 127, 127, 126, 124, 122, 120, 118, 116, 114, 113, 112, 110, 109, 107
 };
 
 const uint8_t basic_tl_d[21] =
 {
-	127, 127, 127, 127, 126, 123, 120, 118, 116, 114, 112, 110, 108, 106, 104, 102, 101, 100, 98, 97, 95
+	127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 127, 125, 123, 121, 119, 117, 116, 115, 113, 112, 110
 };
+
+const uint8_t basic_tl_e[21] =
+{
+	127, 127, 127, 127, 125, 122, 119, 117, 115, 113, 111, 109, 107, 105, 103, 101, 100, 99, 97, 96, 94
+};
+
 
 /*
 * ALG OP1 OP2 OP3 OP4
 * -------------------
-* 0   a   a   a   a
-* 1   a   a   a   a
-* 2   a   a   a   a
-* 3   a   a   a   a
+* 0   e   a   a   a
+* 1   e   a   a   a
+* 2   e   a   a   a
+* 3   e   a   a   a
 * 4   b   a   b   a
 * 5   c   c   c   a
 * 6   c   c   c   a
@@ -351,10 +357,10 @@ const uint8_t basic_tl_d[21] =
 
 const uint8_t *tl_alg[8][4] =
 {
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_e},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_e},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_e},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_e},
 	{basic_tl_a, basic_tl_a, basic_tl_b, basic_tl_b},
 	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
 	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},

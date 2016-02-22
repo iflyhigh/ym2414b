@@ -16,7 +16,7 @@ void wait(uint8_t loop)
 	for (wi = 0; wi < loop; wi++)
 	{
 		// 16MHz  nop = @60nSec
-		asm volatile("nop\n\t");
+		asm volatile("nop");
 	}
 }
 
@@ -37,37 +37,36 @@ void setreg(uint8_t reg, uint8_t data)
 	while (ym_busy)
 	{
 		YM_CTRL_PORT &= ~_BV(YM_RD);	// RD low - read data
-		wait(1);
+		//wait(1);
 		YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
-		wait(3);
+		wait(3);						// minimal delay
 		ym_busy = (YM_DATA_PIN & _BV(7));
 		YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 		YM_CTRL_PORT |= _BV(YM_RD);		// RD high - stop reading data
-		wait(50);
+		//wait(5);
 	}
 
 	ym_busy = 1;
 	YM_DATA_DDR = 0xff;
-	//wait(50);
 
 	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(1);
+	//wait(1);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 	YM_DATA_PORT = reg;				// register address
-	wait(3);
+	//wait(3);
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
 	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
-	wait(60);
+	wait(7); 						// minimal delay
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	wait(1);
+	//wait(1);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 	YM_DATA_PORT = data;			// register data
-	wait(3);
+	//wait(3);
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	wait(60);
+	//wait(60);
 }
 
 uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t seq_note, uint8_t seq_velocity)

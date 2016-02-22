@@ -351,10 +351,10 @@ const uint8_t basic_tl_d[21] =
 
 const uint8_t *tl_alg[8][4] =
 {
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
-	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_a},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
+	{basic_tl_a, basic_tl_a, basic_tl_a, basic_tl_b},
 	{basic_tl_a, basic_tl_a, basic_tl_b, basic_tl_b},
 	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},
 	{basic_tl_a, basic_tl_c, basic_tl_c, basic_tl_c},

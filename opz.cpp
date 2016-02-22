@@ -22,6 +22,12 @@ void wait(uint8_t loop)
 
 void setreg(uint8_t reg, uint8_t data)
 {
+	/*
+	Serial.print("addr 0x");
+	Serial.println(reg, HEX);
+	Serial.print("data     0x");
+	Serial.println(data, HEX);
+	*/
 	uint8_t ym_busy = 1;
 
 	YM_DATA_DDR = 0x00; 				// input mode for data bus pins
@@ -42,7 +48,7 @@ void setreg(uint8_t reg, uint8_t data)
 
 	ym_busy = 1;
 	YM_DATA_DDR = 0xff;
-	wait(50);
+	//wait(50);
 
 	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
@@ -136,25 +142,70 @@ uint8_t lfo(uint8_t speed, uint8_t waveform)
 {
 	if (waveform == 3)
 	{
-		return pgm_read_byte(lfo_sh[speed]);
+		return pgm_read_byte(&lfo_sh[speed]);
 	}
 	else
 	{
-		return pgm_read_byte(lfo_other[speed]);
+		return pgm_read_byte(&lfo_other[speed]);
 	}
 }
 
 void load_patch(uint16_t i)
 {
-	// space vibe
+	/*
 	unsigned char data[84] =
 	{
-		0x19, 0x0F, 0x0F, 0x07, 0x0F, 0x05, 0x00, 0x62, 0x0D, 0x00, 0x19, 0x00, 0x0F, 0x07, 0x0F, 0x05,
-		0x01, 0x63, 0x04, 0x00, 0x19, 0x00, 0x0F, 0x07, 0x0F, 0x05, 0x02, 0x63, 0x0D, 0x06, 0x1F, 0x00,
-		0x06, 0x02, 0x0F, 0x05, 0x01, 0x63, 0x04, 0x06, 0x47, 0x23, 0x00, 0x4B, 0x00, 0x71, 0x1E, 0x0C,
-		0x04, 0x00, 0x63, 0x32, 0x00, 0x00, 0x00, 0x32, 0x00, 0x53, 0x70, 0x61, 0x63, 0x65, 0x20, 0x56,
-		0x69, 0x62, 0x65, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x10, 0x00, 0x00, 0x00, 0x50, 0x00,
-		0x50, 0x00, 0x00, 0x00
+		AR    D1R   D2R   RR    D1L   KLS   AME   OUT   F     RS_DET
+		0x1F, 0x1F, 0x00, 0x03, 0x0F, 0x00, 0x00, 0x2E, 0x3F, 0x00, OP4
+		0x1F, 0x1F, 0x00, 0x04, 0x0F, 0x00,	0x00, 0x47, 0x11, 0x06, OP2
+		0x1F, 0x1F, 0x00, 0x06, 0x0F, 0x00, 0x40, 0x3A, 0x0B, 0x00, OP3
+		0x1F, 0x1F,	0x00, 0x06, 0x0F, 0x00, 0x40, 0x5C, 0x3F, 0x06, OP1
+
+		0x22, SY_FB_ALG
+		0x37, LFS
+		0x00, LFD
+		0x00, PMD
+		0x28, AMD
+		0x6D, PMS_AMS_LFW
+		0x18, TRANSPOSE
+		0x04, PBR
+		0x04, CH_MO_SU_PO_PM
+		0x00, PORT
+		0x63, FC_VOL
+		0x01, MW_PITCH
+		0x63, MW_AMPLI
+		0x00, BC_PITCH
+		0x00, BC_AMPLI
+		0x32, BC_P_BIAS
+		0x00, BC_E_BIAS
+
+		0x41, 0x6C, 0x61, 0x72, 0x6D, 0x20, 0x43, 0x61, 0x6C, 0x6C, VOICE_NAME
+		0x63,
+		0x63,
+		0x63,
+		0x32,
+		0x32,
+		0x32,
+
+		EGS   OSW_FINE
+		0x00, 0x40, OP4
+		0x0E, 0x50, OP2
+		0x00, 0x00, OP3
+		0x0A, 0x0F, OP1
+
+		0x00, REV
+		0x00, FC_PITCH
+		0x00  FC_AMPLI
+		};
+		*/
+	unsigned char data[84] =
+	{
+		0x0B, 0x04, 0x05, 0x04, 0x0F, 0x00, 0x42, 0x55, 0x22, 0x06, 0x0A, 0x07, 0x04, 0x04, 0x0F, 0x00,
+		0x02, 0x47, 0x0A, 0x00, 0x0B, 0x1F, 0x02, 0x04, 0x0F, 0x00, 0x02, 0x63, 0x0D, 0x06, 0x0B, 0x1F,
+		0x02, 0x05, 0x0F, 0x00, 0x02, 0x62, 0x04, 0x00, 0x1C, 0x1E, 0x06, 0x11, 0x09, 0x5A, 0x0C, 0x04,
+		0x04, 0x00, 0x63, 0x28, 0x00, 0x00, 0x00, 0x32, 0x00, 0x42, 0x6F, 0x77, 0x65, 0x64, 0x42, 0x65,
+		0x6C, 0x6C, 0x20, 0x63, 0x63, 0x63, 0x32, 0x32, 0x32, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
+		0x00, 0x04, 0x00, 0x00
 	};
 	memcpy(&voice, data, 84);
 
@@ -162,8 +213,8 @@ void load_patch(uint16_t i)
 	setreg(0x17, 0x00);																				// AMD2 = LFO2 Amplitude Modulation Depth
 	setreg(0x17, 0x80);																				// PMD2 = LFO2 Pitch Modulation Depth
 	setreg(0x18, lfo(voice.lfs, (voice.pms_ams_lfw & 0x03)));										// LFRQ1 = LFO1 Speed
-	setreg(0x19, pgm_read_byte(amd[voice.amd]));													// AMD1 = LFO1 Amplitude Modulation Depth
-	setreg(0x19, 0x80 | pgm_read_byte(pmd[voice.pmd]));												// PMD1 = LFO1 Pitch Modulation Depth
+	setreg(0x19, pgm_read_byte(&amd[voice.amd]));													// AMD1 = LFO1 Amplitude Modulation Depth
+	setreg(0x19, 0x80 | pgm_read_byte(&pmd[voice.pmd]));											// PMD1 = LFO1 Pitch Modulation Depth
 	//setreg(0x1b, 0x00 | ((voice.sy_fbl_alg & 0x40) >> 1) | ((voice.sy_fbl_alg & 0x40) >> 2) |		// UNUSED !!! LFO2 Sync + LFO1 Sync ...
 	//       ((voice.pms_ams_lfw & 0x03) << 2) | (voice.pms_ams_lfw & 0x03));						// UNUSED !!! ... + LFO2 Waveform + LFO1 Waveform
 	setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
@@ -188,7 +239,7 @@ void load_patch(uint16_t i)
 				{
 					dt1_local = (7 - (voice.op[k].rs_det & 0x07));
 				}
-				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | pgm_read_byte(mul[voice.op[k].f]));		// DT1 + MUL = Detune 1 + 4 upper bits of CRS (coarse frequency)
+				setreg(0x40 + j + 0x08 * k, (dt1_local << 4) | pgm_read_byte(&mul[voice.op[k].f]));		// DT1 + MUL = Detune 1 + table func
 			}
 			else																						// FIX mode
 			{
@@ -197,9 +248,9 @@ void load_patch(uint16_t i)
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);									// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |							// KRS + FIX + AR = Key rate scaling ...
-			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 1) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
-			setreg(0xa0 + j + 0x08 * k, (voice.op[k].ame_ebs_kvs & 0x80) | voice.op[k].d1r);			// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
-			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
+			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 2) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
+			setreg(0xa0 + j + 0x08 * k, ((voice.op[k].ame_ebs_kvs & 0x40) << 1) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
+			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(&dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |			// EGS + REV = EG shift + 1 magic bit + ...
 			       voice.rev);																			// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
@@ -211,7 +262,7 @@ uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity)
 {
 	uint8_t opz_octave;
 	uint8_t opz_note;
-	uint8_t opz_fraction = 0xf1;	// no microtuning at this time
+	uint8_t opz_fraction = 0x00;	// no microtuning at this time
 
 	midi_note = midi_note + (voice.transpose - 24) - 12;	// TRPS = transpose according to middle C, shift by 12 down for simpler calculations
 

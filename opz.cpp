@@ -69,37 +69,19 @@ void setreg(uint8_t reg, uint8_t data)
 	//wait(60);
 }
 
-uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t seq_note, uint8_t seq_velocity)
+uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t seq_note, uint8_t seq_velocity, uint8_t opz_volume)
 {
 	uint16_t _tl;
 	uint8_t _kvs = 0;
 	uint8_t _kls = 0;
-	/*
-		Serial.println("----------------------");
-		Serial.println();
-		Serial.print("tl(");
-		Serial.print(op);
-		Serial.print(", ");
-		Serial.print(vmem_tl);
-		Serial.print(", ");
-		Serial.print(vmem_alg);
-		Serial.print(", ");
-		Serial.print(vmem_kvs);
-		Serial.print(", ");
-		Serial.print(vmem_kls);
-		Serial.print(", ");
-		Serial.print(seq_note);
-		Serial.print(", ");
-		Serial.print(seq_velocity);
-		Serial.println(");");
-	*/
+
 	if (vmem_tl < 21)
 	{
-		_tl = tl_alg[vmem_alg][op][vmem_tl];
+		_tl = basic_tl[vmem_tl] + tl_alg[vmem_alg][op] + (tl_vol[vmem_alg][op] ? volume_tl[midi_volume] : 0);
 	}
 	else
 	{
-		_tl = tl_alg[vmem_alg][op][20] - (vmem_tl - 20);
+		_tl = basic_tl[20] + tl_alg[vmem_alg][op] - vmem_tl + 20 + (tl_vol[vmem_alg][op] ? volume_tl[midi_volume] : 0);
 	}
 
 	if (vmem_kvs > 0)
@@ -211,11 +193,12 @@ void load_patch(uint16_t i)
 	}
 }
 
-uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity)
+uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume)
 {
 	uint8_t opz_octave;
 	uint8_t opz_note;
 	uint8_t opz_fraction = 0x00;	// no microtuning at this time
+	uint8_t opz_volume = (uint8_t)round(((float)midi_volume) / 1.283f);
 
 	midi_note = midi_note + (voice.transpose - 24) - 12;	// TRPS = transpose according to middle C, shift by 12 down for simpler calculations
 
@@ -230,7 +213,7 @@ uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity)
 		for (uint8_t k = 0; k < 4; k++)
 		{
 			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
-			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, midi_velocity)));
+			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, midi_velocity, opz_volume)));
 		}
 
 		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note

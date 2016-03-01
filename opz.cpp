@@ -77,11 +77,11 @@ uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint
 
 	if (vmem_tl < 21)
 	{
-		_tl = basic_tl[vmem_tl] + tl_alg[vmem_alg][op] + (tl_vol[vmem_alg][op] ? volume_tl[midi_volume] : 0);
+		_tl = basic_tl[vmem_tl] + tl_alg[vmem_alg][op] + (tl_vol[vmem_alg][op] ? pgm_read_byte(&volume_tl[midi_volume]) : 0);
 	}
 	else
 	{
-		_tl = basic_tl[20] + tl_alg[vmem_alg][op] - vmem_tl + 20 + (tl_vol[vmem_alg][op] ? volume_tl[midi_volume] : 0);
+		_tl = basic_tl[20] + tl_alg[vmem_alg][op] - vmem_tl + 20 + (tl_vol[vmem_alg][op] ? pgm_read_byte(&volume_tl[midi_volume]) : 0);
 	}
 
 	if (vmem_kvs > 0)
@@ -179,28 +179,41 @@ void load_patch(uint16_t i)
 			else																						// FIX mode
 			{
 				setreg(0x40 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x07) << 4) |
-				       ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
+					   ((voice.op[k].f & 0x3c) >> 2));													// FXR + FXF = Fixed range + 4 upper bits of fixed frequency
 			}
 			setreg(0x40 + j + 0x08 * k, 0x80 | voice.aop[k].osw_fine);									// OW + FINE = Oscillator waveform + fine frequency tuning
 			setreg(0x80 + j + 0x08 * k, ((voice.op[k].rs_det & 0x18) << 3) |							// KRS + FIX + AR = Key rate scaling ...
-			       ((voice.aop[k].egshft_fix_fixrg & 0x08) << 2) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
+				   ((voice.aop[k].egshft_fix_fixrg & 0x08) << 2) | (voice.op[k].ar & 0x1f) );			// ... + fix/ratio mode + operator attack rate
 			setreg(0xa0 + j + 0x08 * k, ((voice.op[k].ame_ebs_kvs & 0x40) << 1) | voice.op[k].d1r);		// AME + D1R = Amplitude modulation enable + Operator Decay 1 Rate
 			setreg(0xc0 + j + 0x08 * k, (pgm_read_byte(&dt2[voice.op[k].f]) << 6) | voice.op[k].d2r);	// DT2 + D2R = Detune 2 + Operator Decay 2 Rate
 			setreg(0xc0 + j + 0x08 * k, ((voice.aop[k].egshft_fix_fixrg & 0x20) << 2) | 0x28 |			// EGS + REV = EG shift + 1 magic bit + ...
-			       voice.rev);																			// ... + reverb rate
+				   voice.rev);																			// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
 	}
 }
 
-uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume)
+uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume, uint8_t micro_tuning)
 {
 	uint8_t opz_octave;
 	uint8_t opz_note;
-	uint8_t opz_fraction = 0x00;	// no microtuning at this time
-	//uint8_t opz_volume = (uint8_t)round(((float)midi_volume) / 1.283f);
+	uint8_t opz_fraction = 0;
 
 	midi_note = midi_note + (voice.transpose - 24) - 12;	// TRPS = transpose according to middle C, shift by 12 down for simpler calculations
+
+	if (((midi_note % 12) > 0) && (midi_note > 0))
+	{
+		if (note_tuning[micro_tuning][(midi_note % 12) - 1] < 0)
+		{
+			midi_note--;
+			opz_fraction = 63 + note_tuning[micro_tuning][(midi_note % 12) - 1];
+		}
+		else
+		{
+			opz_fraction = note_tuning[micro_tuning][(midi_note % 12) - 1];
+		}
+
+	}
 
 	if ((midi_note > 0) && (midi_note < 97))				// ignore notes that are not supported by YM2414B. TX81z wraps notes, we'll do better
 	{
@@ -213,7 +226,7 @@ uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint
 		for (uint8_t k = 0; k < 4; k++)
 		{
 			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
-			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, midi_velocity, midi_volume)));
+												   (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, midi_velocity, midi_volume)));
 		}
 
 		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note

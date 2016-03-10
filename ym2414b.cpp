@@ -10,19 +10,24 @@
 void setup()
 {
 	// init pins
-	pinMode(pinIC, OUTPUT);
-	pinMode(13, OUTPUT);
+	//pinMode(pinIC, OUTPUT);
+	//pinMode(13, OUTPUT);
 
 	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);	// output mode for control pins
-	YM_DATA_DDR = 0xff;													// output mode for data bus pins
+	//YM_DATA_DDR = 0xff;													// output mode for data bus pins
+	DDRD |= B11111100;													// pins 2-7 output
+	DDRB |= B00000011;													// pins 8-9 output
 	YM_CTRL_PORT |= _BV(YM_WR) | _BV(YM_RD); 							// WR and RD high by default
 
 	// reset YM
+	/*
 	digitalWrite(pinIC, LOW);
 	delay(100);
 	digitalWrite(pinIC, HIGH);
+	*/
 
 	//Serial.begin(9600);
+	//Serial.println("YM2414B demo");
 
 	delay(1000);
 
@@ -68,12 +73,14 @@ void loop()
 
 	for (uint8_t i = 0; i < 7; i++)
 	{
-		set_note(i, 48 + notes[i], 84);
+		set_note2(i, 48 + notes[i], 84);
 		delay(300);
 		unset_note(i);
 		delay(300);
 	}
+	//digitalWrite(2, LOW);
 	delay(1000);
+	//digitalWrite(2, HIGH);
 
 	//load_patch(0);
 	//process_encoders();

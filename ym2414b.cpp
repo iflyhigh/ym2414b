@@ -73,7 +73,7 @@ void loop()
 
 	for (uint8_t i = 0; i < 7; i++)
 	{
-		set_note2(i, 48 + notes[i], 84);
+		set_note(i, 60 + notes[i], 15, 127, 0);
 		delay(300);
 		unset_note(i);
 		delay(300);

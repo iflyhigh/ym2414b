@@ -59,27 +59,31 @@ void setreg(uint8_t reg, uint8_t data)
 	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
 	//wait(1);
+	PORTD |= (reg & B11111100);
+	PORTB |= (reg & B00000011);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 
 	//YM_DATA_PORT = reg;				// register address
-	PORTD |= (reg & B11111100);
-	PORTB |= (reg >> 6);
-	//wait(3);
+	wait(3);
+
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
+	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
+
 	PORTD &= B00000011;
 	PORTB &= B11111100;
-	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
+
 	wait(7); 						// minimal delay
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
 	//wait(1);
+	PORTD |= (data & B11111100);
+	PORTB |= (data & B00000011);
+
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 
 	//YM_DATA_PORT = data;			// register data
-	PORTD |= (data & B11111100);
-	PORTB |= (data >> 6);
 
-	//wait(3);
+	wait(3);
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
 	//wait(60);
@@ -209,44 +213,6 @@ void load_patch(uint16_t i)
 			       voice.rev);																			// ... + reverb rate
 			setreg(0xe0 + j + 0x08 * k, ((15 - voice.op[k].d1l) << 4) | voice.op[k].rr);				// D1L + RR = Operator Decay 1 Level + Release Rate
 		}
-	}
-}
-
-uint8_t set_note2(uint8_t channel, int16_t midi_note, uint8_t midi_velocity)
-{
-	uint8_t opz_octave;
-	uint8_t opz_note;
-	uint8_t opz_fraction = 0;
-
-	midi_note = midi_note + (voice.transpose - 24) - 12;	// TRPS = transpose according to middle C, shift by 12 down for simpler calculations
-
-	if ((midi_note > 0) && (midi_note < 97))				// ignore notes that are not supported by YM2414B. TX81z wraps notes, we'll do better
-	{
-		opz_octave = (midi_note - 1) / 12;
-		opz_note = (midi_note - 1) % 12;
-		if (opz_note > 2) { opz_note++; }									// YM2414B note numbers in octave are 0,1,2,4,5,6,8,9,10,12,13,14
-		if (opz_note > 6) { opz_note++; }
-		if (opz_note > 10) { opz_note++; }
-
-		for (uint8_t k = 0; k < 4; k++)
-		{
-			setreg(0x60 + channel + 0x08 * k, ( tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), 		// TL = Operator output level
-			                                       (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, 127, 127)));
-			//Serial.print("TL=");
-			//Serial.println(tl(k, voice.op[k].out, (voice.sy_fbl_alg & 0x07), (voice.op[k].ame_ebs_kvs & 0x07), voice.op[k].kls, midi_note, 127, 127));
-		}
-
-		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note
-		setreg(0x30 + channel, (opz_fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
-		setreg(0x08, 0x78 | channel);										// Key ON for channel (all 4 OPs are running)
-		//setreg(0x20 + channel, 0x80 | (voice.sy_fbl_alg & 0x3f));					// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
-		setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
-
-		return SET_NOTE_OK;
-	}
-	else
-	{
-		return SET_NOTE_NOT_IN_RANGE;
 	}
 }
 

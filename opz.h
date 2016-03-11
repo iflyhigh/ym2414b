@@ -17,5 +17,4 @@
 void setreg(uint8_t reg, uint8_t data);
 void load_patch(uint16_t i);
 uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume, uint8_t micro_tuning);
-uint8_t set_note2(uint8_t channel, int16_t midi_note, uint8_t midi_velocity);
 void unset_note(uint8_t channel);

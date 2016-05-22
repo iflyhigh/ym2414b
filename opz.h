@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include <MIDI.h>
 
 #define YM_CTRL_DDR DDRC
 #define YM_CTRL_PORT PORTC
@@ -18,3 +19,4 @@ void setreg(uint8_t reg, uint8_t data);
 void load_patch(uint16_t i);
 uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume, uint8_t micro_tuning);
 void unset_note(uint8_t channel);
+void modify_running_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint8_t midi_volume);

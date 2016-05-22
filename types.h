@@ -52,3 +52,11 @@ struct voice_t
 	uint8_t fc_pitch;
 	uint8_t fc_ampli;
 };		// 84 bytes
+
+struct opz_rt_note_t
+{
+	uint8_t midi_note;
+	uint8_t midi_velocity;
+	uint8_t midi_volume;
+	uint8_t microtuning;
+};

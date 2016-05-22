@@ -2,17 +2,76 @@
 // see http://sr4.sakura.ne.jp/fmsound/opz.html for YM2414B register analysis
 #define __PROG_TYPES_COMPAT__
 #include <avr/pgmspace.h>
-
 #include "opz.h"
 #include "types.h"
 
+const uint8_t opz_channel_count = 8;
+
+uint8_t midi_channel_volume = 127;
+uint8_t midi_channel_number = 1;
+uint8_t microtuning = 0;
+
+opz_rt_note_t opz_channel[opz_channel_count];
+
+MIDI_CREATE_DEFAULT_INSTANCE();
+
+void handleCC(byte channel, byte cc, byte value)
+{
+	switch (cc)
+	{
+	case midi::ChannelVolume:
+		midi_channel_volume = value;
+		for (uint8_t i = 0; i < opz_channel_count; i++)
+		{
+			if (opz_channel[i].midi_note > 0)
+			{
+				modify_running_note(i, opz_channel[i].midi_note, opz_channel[i].midi_velocity, value);
+				opz_channel[i].midi_volume = value;
+			}
+		}
+		break;
+	case midi::ModulationWheel:
+		break;
+	default:
+		break;
+	}
+}
+
+void handlePitchWheel(byte channel, int value)
+{
+
+}
+
+void handleNoteOn(byte channel, byte note, byte velocity)
+{
+	for (uint8_t i = 0; i < opz_channel_count; i++)
+	{
+		if (opz_channel[i].midi_note == 0)
+		{
+			set_note(i, note, velocity, midi_channel_volume, microtuning);
+			opz_channel[i].midi_note = note;
+			opz_channel[i].midi_velocity = velocity;
+			opz_channel[i].midi_volume = midi_channel_volume;
+			opz_channel[i].microtuning = microtuning;
+			break;
+		}
+	}
+}
+void handleNoteOff(byte channel, byte note, byte velocity)
+{
+	for (uint8_t i = 0; i < opz_channel_count; i++)
+	{
+		if (opz_channel[i].midi_note == note)
+		{
+			unset_note(i);
+			opz_channel[i].midi_note = 0;
+			break;
+		}
+	}
+}
 
 void setup()
 {
-	// init pins
-	//pinMode(pinIC, OUTPUT);
-	//pinMode(13, OUTPUT);
-
 	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);	// output mode for control pins
 	//YM_DATA_DDR = 0xff;													// output mode for data bus pins
 	DDRD |= B11111100;													// pins 2-7 output
@@ -48,43 +107,15 @@ void setup()
 		setreg(0x08, 0x00 + j);	// Key OFF channel j
 	}
 
-	/*
-	for (uint16_t i = 0; i <= 255; i++)
-	{
-	Serial.print("0x");
-	Serial.print(i, HEX);
-	Serial.print(" = 0x");
-	Serial.print(yamaha[i], HEX);
-	if (((i >= 0x40) && (i <= 0x5f)) || ((i >= 0x80) && (i <= 0x9f)) || ((i >= 0xc0) && (i <= 0xdf)))
-	{
-	Serial.print(" / 0x");
-	Serial.print(yamaha2[i], HEX);
-	}
-	Serial.println();
-	}
-	delay(100000);
-	*/
+	MIDI.setHandleNoteOn(handleNoteOn);
+	MIDI.setHandleNoteOff(handleNoteOff);
+	MIDI.setHandleControlChange(handleCC);
+	MIDI.setHandlePitchBend(handlePitchWheel);
+	MIDI.begin(midi_channel_number);
 }
 
 void loop()
 {
-
-	uint8_t notes[] = {0, 2, 4, 5, 7, 9, 11};
-
-	for (uint8_t i = 0; i < 7; i++)
-	{
-		set_note(i, 48 + notes[i], 127, 127, 1);
-		delay(300);
-		unset_note(i);
-		delay(300);
-	}
-	//digitalWrite(2, LOW);
-	delay(1000);
-	//digitalWrite(2, HIGH);
-
-	//load_patch(0);
-	//process_encoders();
-	//update_display();
-	//MIDI.read();
+	MIDI.read();
+	setreg(0x0f, 0x00);
 }
-

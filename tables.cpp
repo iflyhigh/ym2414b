@@ -412,6 +412,7 @@ const prog_uchar PROGMEM pmd[100] =
 	115, 116, 118, 119, 120, 121, 123, 124, 125, 127
 };
 
+/*
 
 const prog_uchar PROGMEM amd_mw_99_amd_0[128] =
 {

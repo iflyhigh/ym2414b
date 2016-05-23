@@ -16,7 +16,8 @@ void wait(uint8_t loop)
 	for (wi = 0; wi < loop; wi++)
 	{
 		// 16MHz  nop = @60nSec
-		asm volatile("nop");
+		//asm volatile("nop\n\t nop\n\t nop\n\t nop\n\t");
+		asm volatile("nop\n\t");
 	}
 }
 
@@ -24,64 +25,62 @@ void setreg(uint8_t reg, uint8_t data)
 {
 	uint8_t ym_busy = 1;
 
-	//YM_DATA_DDR = 0x00; 				// input mode for data bus pins
-	DDRD &= B00000011;
-	DDRB &= B11111100;
+	//YM_DATA_DDR = 0x00;
+	DDRD &= B00000011;					// input mode for data bus pins
+	DDRB &= B11111100;					// input mode for data bus pins
 
-	YM_CTRL_PORT |= _BV(YM_A0);
-	YM_CTRL_PORT |= _BV(YM_WR);
+	//PORTD |= B11111100;					// enable pullups
+	//PORTB |= B00000011;					// enable pullups
+
+	//YM_CTRL_PORT |= _BV(YM_A0);
+	//YM_CTRL_PORT |= _BV(YM_WR);
+
+	wait(4);							// some time is needed to setup
 
 	while (ym_busy)
 	{
 		YM_CTRL_PORT &= ~_BV(YM_RD);	// RD low - read data
-		//wait(1);
 		YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
-		wait(3);						// minimal delay
+		wait(3);						// minimal delay 3
 		//ym_busy = (YM_DATA_PIN & _BV(7));
 		ym_busy = (PIND & _BV(7));
-
-		YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
-		YM_CTRL_PORT |= _BV(YM_RD);		// RD high - stop reading data
-		//wait(5);
+		YM_CTRL_PORT |= _BV(YM_CS) | _BV(YM_RD);;		// CS high - chip unselect, RD high - stop reading data
+		wait(15);
 	}
 	ym_busy = 1;
-	//YM_DATA_DDR = 0xff;
-	DDRD |= B11111100;
-	DDRB |= B00000011;
 
-	YM_CTRL_PORT &= ~_BV(YM_A0); 	// A0 low - write register address
-	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	//wait(1);
+	DDRD |= B11111100;				// output mode for data bus pins
+	DDRB |= B00000011;				// output mode for data bus pins
+
+	PORTD &= B00000011;				// zero out data bus
+	PORTB &= B11111100;				// zero out data bus
+
+	YM_CTRL_PORT &= ~_BV(YM_A0) & ~_BV(YM_WR); 	// A0 low - write register address, WR low - write data
 	PORTD |= (reg & B11111100);
 	PORTB |= (reg & B00000011);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 
-	//YM_DATA_PORT = reg;				// register address
-	//wait(3);
+	wait(3);						// do as tx81z
 
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
-	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	YM_CTRL_PORT |= _BV(YM_A0);		// A0 high - write register data
+	YM_CTRL_PORT |= _BV(YM_WR) | _BV(YM_A0); //  WR high - data written, A0 high - write register data
 
-	PORTD &= B00000011;
-	PORTB &= B11111100;
+	PORTD &= B00000011;				// zero out data bus
+	PORTB &= B11111100;				// zero out data bus
 
-	wait(7); 						// minimal delay
-	wait(100);						// reduces glitches TBD!!!
+	wait(11); 						// minimal delay 7
+
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	//wait(1);
 	PORTD |= (data & B11111100);
 	PORTB |= (data & B00000011);
-
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
-	//YM_DATA_PORT = data;			// register data
 
-	//wait(3);
+	wait(3);						// do as tx81z
+
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR);		// WR high - data written
-	//wait(60);
-	PORTD &= B00000011;
-	PORTB &= B11111100;
+
+	wait(24);
 }
 
 uint8_t tl(uint8_t op, uint8_t vmem_tl, uint8_t vmem_alg, uint8_t vmem_kvs, uint8_t vmem_kls, uint8_t seq_note, uint8_t seq_velocity, uint8_t midi_volume)

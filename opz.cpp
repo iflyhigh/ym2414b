@@ -25,24 +25,16 @@ void setreg(uint8_t reg, uint8_t data)
 {
 	uint8_t ym_busy = 1;
 
-	//YM_DATA_DDR = 0x00;
 	DDRD &= B00000011;					// input mode for data bus pins
 	DDRB &= B11111100;					// input mode for data bus pins
 
-	//PORTD |= B11111100;					// enable pullups
-	//PORTB |= B00000011;					// enable pullups
-
-	//YM_CTRL_PORT |= _BV(YM_A0);
-	//YM_CTRL_PORT |= _BV(YM_WR);
-
 	wait(4);							// some time is needed to setup
 
-	while (ym_busy)
+	while (ym_busy > 0)
 	{
 		YM_CTRL_PORT &= ~_BV(YM_RD);	// RD low - read data
 		YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 		wait(3);						// minimal delay 3
-		//ym_busy = (YM_DATA_PIN & _BV(7));
 		ym_busy = (PIND & _BV(7));
 		YM_CTRL_PORT |= _BV(YM_CS) | _BV(YM_RD);;		// CS high - chip unselect, RD high - stop reading data
 		wait(15);
@@ -52,12 +44,9 @@ void setreg(uint8_t reg, uint8_t data)
 	DDRD |= B11111100;				// output mode for data bus pins
 	DDRB |= B00000011;				// output mode for data bus pins
 
-	PORTD &= B00000011;				// zero out data bus
-	PORTB &= B11111100;				// zero out data bus
-
 	YM_CTRL_PORT &= ~_BV(YM_A0) & ~_BV(YM_WR); 	// A0 low - write register address, WR low - write data
-	PORTD |= (reg & B11111100);
-	PORTB |= (reg & B00000011);
+	PORTD = ((reg & B11111100) | B00000011);
+	PORTB = ((reg & B00000011) | B11111100);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 
 	wait(3);						// do as tx81z
@@ -65,14 +54,11 @@ void setreg(uint8_t reg, uint8_t data)
 	YM_CTRL_PORT |= _BV(YM_CS);		// CS high - chip unselect
 	YM_CTRL_PORT |= _BV(YM_WR) | _BV(YM_A0); //  WR high - data written, A0 high - write register data
 
-	PORTD &= B00000011;				// zero out data bus
-	PORTB &= B11111100;				// zero out data bus
-
 	wait(11); 						// minimal delay 7
 
 	YM_CTRL_PORT &= ~_BV(YM_WR);	// WR low - write data
-	PORTD |= (data & B11111100);
-	PORTB |= (data & B00000011);
+	PORTD = ((data & B11111100) | B00000011);
+	PORTB = ((data & B00000011) | B11111100);
 	YM_CTRL_PORT &= ~_BV(YM_CS);	// CS low - chip select
 
 	wait(3);						// do as tx81z
@@ -234,7 +220,7 @@ uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint
 		setreg(0x28 + channel, (opz_octave << 4) | opz_note);				// Set channel note
 		setreg(0x30 + channel, (opz_fraction << 2) | 0x01);					// Set channel note fraction + MONO bit=1
 		setreg(0x08, 0x78 | channel);										// Key ON for channel (all 4 OPs are running)
-		//setreg(0x20 + channel, 0x80 | (voice.sy_fbl_alg & 0x3f));					// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
+		setreg(0x20 + channel, 0x80 | (voice.sy_fbl_alg & 0x3f));					// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
 		setreg(0x1b, ((voice.sy_fbl_alg & 0x40) >> 2) | (voice.pms_ams_lfw & 0x03));					// LFO1 Sync + LFO1 Waveform
 
 		return SET_NOTE_OK;
@@ -247,7 +233,7 @@ uint8_t set_note(uint8_t channel, int16_t midi_note, uint8_t midi_velocity, uint
 
 void unset_note(uint8_t channel)
 {
-	//setreg(0x20 + channel, 0xc0 | (voice.sy_fbl_alg & 0x3f));						// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
+	setreg(0x20 + channel, 0xc0 | (voice.sy_fbl_alg & 0x3f));						// R + UNK1 + Feedback + Algorithm, UNK1=1 when no output, =0 when playing note
 	setreg(0x08, 0x00 | channel);
 }
 

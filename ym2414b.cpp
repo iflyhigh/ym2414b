@@ -117,5 +117,5 @@ void setup()
 void loop()
 {
 	MIDI.read();
-	//setreg(0x0f, 0x00);
+	//setreg(0x1b, 0x00);
 }

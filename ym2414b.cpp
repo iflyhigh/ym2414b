@@ -4,6 +4,13 @@
 #include <avr/pgmspace.h>
 #include "opz.h"
 #include "types.h"
+#include <SdFat.h>
+
+const uint8_t spiSpeed = SPI_HALF_SPEED;
+const uint8_t SD_CHIP_SELECT = SS;
+
+SdFat sd;
+SdBaseFile file;
 
 const uint8_t opz_channel_count = 8;
 
@@ -32,8 +39,32 @@ void handleCC(byte channel, byte cc, byte value)
 		break;
 	case midi::ModulationWheel:
 		break;
+	case midi::BankSelect:
+		break;
 	default:
 		break;
+	}
+}
+
+void handleProgramChange(byte channel, byte program)
+{
+	char filename[3];
+
+	if (file.open(itoa((program - 1), filename, 10)))
+	{
+		switch (file.fileSize())
+		{
+		case 84:
+			file.read(&amem, 84);
+			break;
+		case 73:
+			file.read(&amem, 73);
+			break;
+		default:
+			break;
+		}
+		file.close();
+		init_voice();
 	}
 }
 
@@ -57,6 +88,7 @@ void handleNoteOn(byte channel, byte note, byte velocity)
 		}
 	}
 }
+
 void handleNoteOff(byte channel, byte note, byte velocity)
 {
 	for (uint8_t i = 0; i < opz_channel_count; i++)
@@ -100,7 +132,7 @@ void setup()
 	setreg(0x14, 0x70);
 	setreg(0x15, 0x01);
 
-	load_patch(0);
+	//load_patch(0);
 
 	for (uint8_t j = 0; j < 8; j++)
 	{
@@ -111,7 +143,19 @@ void setup()
 	MIDI.setHandleNoteOff(handleNoteOff);
 	MIDI.setHandleControlChange(handleCC);
 	MIDI.setHandlePitchBend(handlePitchWheel);
+	MIDI.setHandleProgramChange(handleProgramChange);
 	MIDI.begin(midi_channel_number);
+
+	if (!sd.begin(SD_CHIP_SELECT, SPI_HALF_SPEED))
+	{
+		sd.initErrorHalt();
+	}
+
+	if (sd.chdir("0/0"))
+	{
+		handleProgramChange(midi_channel_number, 2);
+		init_voice();
+	}
 }
 
 void loop()

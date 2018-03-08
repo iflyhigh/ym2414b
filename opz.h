@@ -1,6 +1,5 @@
 #include "Arduino.h"
 #include <MIDI.h>
-#include "types.h"
 
 #define YM_CTRL_DDR DDRC
 #define YM_CTRL_PORT PORTC

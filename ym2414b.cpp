@@ -3,7 +3,6 @@
 #define __PROG_TYPES_COMPAT__
 #include <avr/pgmspace.h>
 #include "opz.h"
-#include "types.h"
 #include <SdFat.h>
 
 const uint8_t spiSpeed = SPI_HALF_SPEED;
@@ -17,6 +16,8 @@ const uint8_t opz_channel_count = 8;
 uint8_t midi_channel_volume = 127;
 uint8_t midi_channel_number = 1;
 uint8_t microtuning = 0;
+uint8_t midi_bank = 0;
+uint8_t midi_program = 0;
 
 opz_rt_note_t opz_channel[opz_channel_count];
 
@@ -24,6 +25,8 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 
 void handleCC(byte channel, byte cc, byte value)
 {
+	char dirname[3];
+
 	switch (cc)
 	{
 	case midi::ChannelVolume:
@@ -40,6 +43,9 @@ void handleCC(byte channel, byte cc, byte value)
 	case midi::ModulationWheel:
 		break;
 	case midi::BankSelect:
+		sd.chdir();
+		sd.chdir("0");
+		sd.chdir(itoa(value, dirname, 10));
 		break;
 	default:
 		break;
@@ -50,15 +56,12 @@ void handleProgramChange(byte channel, byte program)
 {
 	char filename[3];
 
-	if (file.open(itoa((program - 1), filename, 10)))
+	if (file.open(itoa(program, filename, 10)))
 	{
 		switch (file.fileSize())
 		{
 		case 84:
 			file.read(&amem, 84);
-			break;
-		case 73:
-			file.read(&amem, 73);
 			break;
 		default:
 			break;
@@ -104,6 +107,8 @@ void handleNoteOff(byte channel, byte note, byte velocity)
 
 void setup()
 {
+	char dirname[3];
+
 	YM_CTRL_DDR |= _BV(YM_CS) | _BV(YM_RD) | _BV(YM_WR) | _BV(YM_A0);	// output mode for control pins
 	//YM_DATA_DDR = 0xff;													// output mode for data bus pins
 	DDRD |= B11111100;													// pins 2-7 output
@@ -151,9 +156,10 @@ void setup()
 		sd.initErrorHalt();
 	}
 
-	if (sd.chdir("0/0"))
+	if (sd.chdir("0"))
 	{
-		handleProgramChange(midi_channel_number, 2);
+		sd.chdir(itoa(midi_bank, dirname, 10));
+		handleProgramChange(midi_channel_number, midi_program);
 		init_voice();
 	}
 }

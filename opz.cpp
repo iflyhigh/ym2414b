@@ -2,7 +2,6 @@
 #include <avr/pgmspace.h>
 #include <Arduino.h>
 #include "opz.h"
-#include "types.h"
 #include "tables.h"
 
 #define SET_NOTE_OK 1

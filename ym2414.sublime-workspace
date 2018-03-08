@@ -1,0 +1,1222 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"midi",
+				"midi_channel_number"
+			],
+			[
+				"file",
+				"filename"
+			],
+			[
+				"pr",
+				"program"
+			],
+			[
+				"YM_C",
+				"YM_CTRL_PORT"
+			],
+			[
+				"mid",
+				"midi_volume"
+			],
+			[
+				"op",
+				"opz_channel"
+			],
+			[
+				"by",
+				"byte"
+			],
+			[
+				"opz",
+				"opz_channel"
+			],
+			[
+				"ve",
+				"velocity"
+			],
+			[
+				"prin",
+				"println"
+			],
+			[
+				"vmem",
+				"vmem_alg"
+			],
+			[
+				"POR",
+				"PORTB"
+			],
+			[
+				"wa",
+				"wait"
+			],
+			[
+				"vo",
+				"volume"
+			],
+			[
+				"yama",
+				"yamaha2"
+			],
+			[
+				"pri",
+				"printf	printf …"
+			],
+			[
+				"uin",
+				"uint8_t"
+			],
+			[
+				"lf",
+				"lfo_vmem_reg"
+			],
+			[
+				"init",
+				"init_ym_voice"
+			],
+			[
+				"ini",
+				"init_ym_zero"
+			],
+			[
+				"cha",
+				"channel"
+			],
+			[
+				"voi",
+				"void"
+			],
+			[
+				"inti",
+				"init_zero"
+			],
+			[
+				"un",
+				"unsigned"
+			],
+			[
+				"voic",
+				"voice_t"
+			],
+			[
+				"opm",
+				"opm_to_vmem"
+			],
+			[
+				"o",
+				"opm"
+			],
+			[
+				"voice_",
+				"voice_name"
+			],
+			[
+				"d1",
+				"d1r"
+			],
+			[
+				"pm",
+				"pms_ams_lfw"
+			],
+			[
+				"uit",
+				"uint8_t"
+			],
+			[
+				"mode",
+				"mode_led_brightness"
+			],
+			[
+				"ca",
+				"camera_id"
+			],
+			[
+				"ui",
+				"uint8_t"
+			],
+			[
+				"LED",
+				"LED_LOW_8"
+			],
+			[
+				"bu",
+				"buzzer"
+			],
+			[
+				"st",
+				"step_counter"
+			],
+			[
+				"led",
+				"led_cam_2"
+			],
+			[
+				"mod",
+				"mode_led_brightness_increment"
+			],
+			[
+				"di",
+				"digitalWrite"
+			],
+			[
+				"c",
+				"const"
+			],
+			[
+				"led_cam",
+				"led_cam_1"
+			],
+			[
+				"inc",
+				"include"
+			],
+			[
+				"dig",
+				"digitalWrite"
+			],
+			[
+				"read",
+				"read_buttons"
+			],
+			[
+				"powe",
+				"power_mode"
+			],
+			[
+				"m",
+				"millis"
+			],
+			[
+				"cam",
+				"cam_status"
+			],
+			[
+				"le",
+				"led_mode_1"
+			],
+			[
+				"button_",
+				"button_power"
+			],
+			[
+				"ps",
+				"psu_1"
+			],
+			[
+				"BUTT",
+				"BUTTON_MODE_DELAY"
+			],
+			[
+				"RE",
+				"RESTART_DELAY"
+			],
+			[
+				"B",
+				"BUTTON_MODE_DELAY"
+			],
+			[
+				"Se",
+				"Serial"
+			],
+			[
+				"u",
+				"uint8_t"
+			],
+			[
+				"cur",
+				"current_run"
+			],
+			[
+				"la",
+				"last_run"
+			],
+			[
+				"las",
+				"last_run"
+			],
+			[
+				"rece",
+				"receiver_function"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"set",
+				"setScratchpad"
+			],
+			[
+				"deb",
+				"debug_leds"
+			],
+			[
+				"cam_mo",
+				"cam_mode2"
+			],
+			[
+				"vm",
+				"vmode1"
+			],
+			[
+				"cam_po",
+				"cam_poweroff"
+			],
+			[
+				"cam_pow",
+				"cam_poweron"
+			],
+			[
+				"MODE_",
+				"MODE_VIDEO_1"
+			],
+			[
+				"MODE",
+				"MODE_VIDEO_1"
+			],
+			[
+				"syste",
+				"system_status"
+			],
+			[
+				"inte",
+				"interrupts"
+			],
+			[
+				"sys",
+				"system_status"
+			],
+			[
+				"ch",
+				"charge"
+			],
+			[
+				"boot",
+				"booting"
+			],
+			[
+				"boo",
+				"booting"
+			],
+			[
+				"sw",
+				"switch"
+			],
+			[
+				"def",
+				"default"
+			],
+			[
+				"print",
+				"println"
+			],
+			[
+				"cna",
+				"changed_pins"
+			],
+			[
+				"0x",
+				"0x74"
+			],
+			[
+				"pin",
+				"pin_now"
+			],
+			[
+				"s",
+				"switch1"
+			],
+			[
+				"do",
+				"do_nothing"
+			],
+			[
+				"pinMode",
+				"pinModeTri"
+			],
+			[
+				"but",
+				"button_shutter"
+			],
+			[
+				"A",
+				"AUX"
+			],
+			[
+				"stat",
+				"status_leds"
+			],
+			[
+				"debug",
+				"debug_port"
+			],
+			[
+				"e",
+				"endif"
+			],
+			[
+				"tx_",
+				"tx_pin"
+			],
+			[
+				"de",
+				"delay"
+			],
+			[
+				"v",
+				"voice"
+			],
+			[
+				"uint",
+				"uint32"
+			],
+			[
+				"unse",
+				"unset_note"
+			],
+			[
+				"wr",
+				"write_reg"
+			],
+			[
+				"no",
+				"nospace"
+			],
+			[
+				"prev_",
+				"prev_midi_channel"
+			],
+			[
+				"disa",
+				"display"
+			],
+			[
+				"pa",
+				"patch_number"
+			],
+			[
+				"te",
+				"tens"
+			],
+			[
+				"h",
+				"hundreds"
+			],
+			[
+				"all",
+				"allman"
+			],
+			[
+				"tes",
+				"test2"
+			],
+			[
+				"dela",
+				"delayMicroseconds"
+			],
+			[
+				"rf",
+				"rf_write_reg"
+			],
+			[
+				"ssp",
+				"sspi_write_byte"
+			],
+			[
+				"sspi_read",
+				"sspi_read_byte"
+			],
+			[
+				"SC",
+				"SCK_LOW"
+			],
+			[
+				"sp",
+				"sspi_write"
+			],
+			[
+				"SCK",
+				"SCK_LOW"
+			],
+			[
+				"SS_",
+				"SS_HIGH"
+			],
+			[
+				"SS",
+				"SS_PIN"
+			],
+			[
+				"set_c",
+				"set_ch_amplitude"
+			],
+			[
+				"vcc",
+				"vcc_counter"
+			],
+			[
+				"i2",
+				"i2c_readAck"
+			],
+			[
+				"l",
+				"lights_status"
+			],
+			[
+				"LI",
+				"LIGHTS_OFF"
+			],
+			[
+				"in",
+				"interrupts"
+			],
+			[
+				"n",
+				"noInterrupts"
+			],
+			[
+				"i2c_re",
+				"i2c_request_handler"
+			],
+			[
+				"size",
+				"sizeof"
+			],
+			[
+				"DI",
+				"DIFFBARO_SENSOR_ZERO"
+			],
+			[
+				"DIFF",
+				"DIFFBARO_SENSOR_ZERO"
+			],
+			[
+				"DIF",
+				"DIFFBARO_SENSOR_READING"
+			],
+			[
+				"cu",
+				"current_1"
+			],
+			[
+				"out",
+				"out_reg"
+			],
+			[
+				"del",
+				"delay_cycles_blink"
+			],
+			[
+				"curr",
+				"current_program"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "ym2414b.cpp",
+			"settings":
+			{
+				"buffer_size": 3493,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "fs.cpp",
+			"settings":
+			{
+				"buffer_size": 2,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "opz.cpp",
+			"settings":
+			{
+				"buffer_size": 9264,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "opz.h",
+			"settings":
+			{
+				"buffer_size": 1672,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tables.cpp",
+			"settings":
+			{
+				"buffer_size": 43564,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "tables.h",
+			"settings":
+			{
+				"buffer_size": 580,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: List Packages"
+			],
+			[
+				"Package Control: tag",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 132.0,
+		"history":
+		[
+			"import urllib.request,os; pr='Preferences.sublime-settings'; ip='ignored_packages'; n='Package Control'; s=sublime.load_settings(pr); ig=s.get(ip); ig.append(n); s.set(ip,ig); sublime.save_settings('Preferences.sublime-settings'); pf=n+'.sublime-package'; urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler())); by=urllib.request.urlopen('https://packagecontrol.io/'+pf.replace(' ','%20')).read(); open(os.path.join(sublime.installed_packages_path(),pf),'wb').write(by); ig.remove(n); s.set(ip,ig); sublime.save_settings(pr); print('Package Control: 3.0.0 upgrade successful!')",
+			"import urllib.request,os,hashlib; h = '7183a2d3e96f11eeadd761d777e62404' + 'e330c659d4bb41d3bdf022e94cab3cd0'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://sublime.wbond.net/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by) "
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+	],
+	"file_history":
+	[
+		"/Q/arduino/ym2414b/types.h",
+		"/Q/arduino/ym2414b/fs.cpp",
+		"/Q/arduino/ym2414b/ym2414b.ino",
+		"/D/backup/media-persona.ru/style.css",
+		"/D/backup/media-persona.ru/media.css",
+		"/D/prog/ym2414b/tables.h",
+		"/D/prog/ym2414b/ym2414b.cpp",
+		"/D/prog/ym2414b/tables.cpp",
+		"/D/prog/ym2414b/types.h",
+		"/D/prog/ym2414b/opz.h",
+		"/D/prog/ym2414b/opz.cpp",
+		"/D/prog/ym2414b/ym2414b.ino",
+		"/D/prog/ym2151/ym2151.ino",
+		"/C/Users/Andrew/Desktop/ym2151/ym2151.ino",
+		"/C/Users/Andrew/Desktop/ym2612/ym2612.ino",
+		"/D/prog/robius/master/master.h",
+		"/D/prog/robius/slave/slave.cpp",
+		"/D/prog/robius/slave/slave.h",
+		"/D/prog/robius/master/master.ino",
+		"/D/prog/robius/master/master.cpp",
+		"/D/prog/robius/slave/slave.ino",
+		"/D/prog/robius/slave/README.md",
+		"/D/prog/robius/slave/onewireslave.cpp",
+		"/D/prog/robius/slave/onewireslave.h",
+		"/D/prog/robius/x/x.ino",
+		"/D/prog/robius/slave_test/slave_test.ino",
+		"/D/prog/robius/slave/lowlevel.h",
+		"/D/prog/robius/x/OneWireSlave.h",
+		"/D/prog/robius/x/OneWireSlave.cpp",
+		"/D/prog/robius/slave_test/OneWireSlave.cpp",
+		"/D/prog/robius/robius.ino",
+		"/D/prog/robius/slave_test/OneWireSlave.h",
+		"/D/prog/robius/slave_test/LowLevel.h",
+		"/D/prog/robius/slave/mobius.cpp",
+		"/D/prog/robius/robius.sublime-project",
+		"/D/prog/iflyhigh2/babayaga/def.h",
+		"/D/prog/iflyhigh2/babayaga/types.h",
+		"/D/prog/iflyhigh2/babayaga/kashchey.cpp",
+		"/D/prog/iflyhigh2/babayaga/babayaga.h",
+		"/D/prog/iflyhigh2/babayaga/rx.cpp",
+		"/D/prog/iflyhigh2/kashchey/kashchey.cpp",
+		"/D/prog/iflyhigh2/kashchey/kashchey.h",
+		"/D/prog/iflyhigh2/kashchey/util.cpp",
+		"/D/prog/iflyhigh2/kashchey/led.cpp",
+		"/D/prog/iflyhigh2/kashchey/config.h",
+		"/D/prog/iflyhigh2/kashchey/util.h",
+		"/D/prog/iflyhigh2/kashchey/max72.h",
+		"/D/prog/iflyhigh2/kashchey/max72.cpp",
+		"/D/prog/iflyhigh2/kashchey/analog.cpp",
+		"/D/prog/iflyhigh2/babayaga/babayaga.cpp",
+		"/D/prog/iflyhigh2/babayaga/util.cpp",
+		"/D/prog/iflyhigh2/babayaga/serial.cpp",
+		"/D/prog/iflyhigh2/babayaga/config.h",
+		"/D/prog/NexStarGPS/examples/gps_device/gps_device.ino",
+		"/D/prog/NexStarGPS/NexStarGPS.cpp",
+		"/D/prog/NexStarGPS/soss.cpp",
+		"/D/prog/NexStarGPS/soss.h",
+		"/D/prog/NexStarGPS/ross.cpp",
+		"/D/prog/NexStarGPS/ross.h",
+		"/D/prog/NexStarGPS/NexStarGPS.h",
+		"/D/prog/iflyhigh2/ivansusami/config.h",
+		"/D/prog/NexStarGPS/README.md",
+		"/D/prog/NexStarGPS/examples/gps_device/ross.cpp",
+		"/D/prog/iflyhigh2/babayaga/output.cpp",
+		"/C/Users/Andrew/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/Andrew/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Users/Andrew/AppData/Roaming/Sublime Text 3/Packages/User/SublimeAStyleFormatter.sublime-settings",
+		"/C/Users/Andrew/AppData/Roaming/Sublime Text 3/Packages/SublimeAStyleFormatter/SublimeAStyleFormatter.sublime-settings",
+		"/C/Users/Andrew/Desktop/sketch_feb13a/sketch_feb13a.ino",
+		"/D/prog/iflyhigh2/ivansusami2/rf.cpp",
+		"/D/prog/iflyhigh2/ivansusami2/rf.h",
+		"/D/prog/iflyhigh2/ivansusami2/ivansusami2.h",
+		"/D/prog/iflyhigh2/ivansusami2/ivansusami2.ino",
+		"/D/prog/iflyhigh2/ivansusami2/ivansusami2.cpp",
+		"/D/prog/iflyhigh2/spi_eeprom_test/spi_eeprom_test.ino",
+		"/D/prog/iflyhigh2/ivansusami2/speech.cpp",
+		"/D/prog/iflyhigh2/ivansusami/gps.cpp",
+		"/D/prog/iflyhigh2/ivansusami2/speech.h",
+		"/D/prog/iflyhigh2/ivansusami2/write_adpcm_language_0/wride_adpcm_language_0.ino",
+		"/D/prog/iflyhigh2/babayaga/kashchey.h",
+		"/D/prog/iflyhigh2/babayaga/sensors.cpp",
+		"/D/prog/iflyhigh2/babayaga/imu.cpp",
+		"/D/prog/iflyhigh2/kashchey/intr.cpp",
+		"/D/prog/iflyhigh2/kashchey/intr.h",
+		"/D/prog/iflyhigh2/kashchey/deleteme.txt",
+		"/D/prog/iflyhigh2/kashchey/led.h",
+		"/D/prog/iflyhigh2/kashchey/sb.ino",
+		"/D/prog/iflyhigh2/kashchey/kashchey.ino",
+		"/D/prog/iflyhigh2/kashchey/u-blox-config.ublox.txt",
+		"/D/prog/iflyhigh2/babayaga/nav.cpp",
+		"/D/prog/iflyhigh2/babayaga/protocol.cpp",
+		"/D/prog/iflyhigh2/babayaga/sensors.h",
+		"/D/prog/iflyhigh2/babayaga/util.h",
+		"/D/prog/iflyhigh2/babayaga/frtele.cpp",
+		"/D/prog/iflyhigh2/babayaga/eeprom.cpp",
+		"/D/prog/iflyhigh2/babayaga/eeprom.h",
+		"/D/prog/iflyhigh2/babayaga/i2c.h",
+		"/D/prog/iflyhigh2/babayaga/i2c.cpp",
+		"/D/prog/iflyhigh2/babayaga/nav.h",
+		"/D/prog/iflyhigh2/babayaga/soss.h",
+		"/D/prog/iflyhigh2/babayaga/soss.cpp",
+		"/D/prog/iflyhigh2/babayaga/frtele.h",
+		"/D/prog/iflyhigh2/babayaga/imu.h",
+		"/D/prog/iflyhigh2/babayaga/pid.cpp",
+		"/D/prog/iflyhigh2/babayaga/gps.cpp",
+		"/D/prog/iflyhigh2/babayaga/rx.h",
+		"/D/prog/iflyhigh2/babayaga/gps.h",
+		"/D/prog/iflyhigh2/babayaga/serial.h",
+		"/D/prog/iflyhigh2/babayaga/protocol.h",
+		"/D/prog/iflyhigh2/babayaga/pid.h",
+		"/D/prog/iflyhigh2/babayaga/output.h",
+		"/D/prog/iflyhigh2/babayaga/alarms.h",
+		"/D/prog/iflyhigh2/babayaga/alarms.cpp",
+		"/D/prog/iflyhigh2/babayaga/lcd.cpp",
+		"/D/prog/iflyhigh2/babayaga/lcd.h",
+		"/D/prog/iflyhigh2/babayaga/babayaga.ino",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/config.h",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/Sensors.h",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/IMU.cpp",
+		"/D/prog/iflyhigh2/babayaga/Sensors.h",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/Serial.cpp",
+		"/D/prog/iflyhigh2/babayaga/Serial.cpp",
+		"/D/prog/iflyhigh2/babayaga/RX.cpp",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/RX.cpp",
+		"/D/prog/iflyhigh2/babayaga/RX.h",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/RX.h",
+		"/D/prog/iflyhigh2/babayaga/Serial.h",
+		"/D/prog/iflyhigh2/patrik_e_2014_10_02/Serial.h"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 93.0,
+		"where_history":
+		[
+			"D:\\prog\\robius\\slave",
+			"D:\\prog\\iflyhigh2\\babayaga",
+			"",
+			"D:\\prog\\iflyhigh\\fc",
+			"D:\\prog\\multiwii\\dev-i2c-all\\master\\MultiWii"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"voice",
+			"voice.",
+			"voice",
+			"ams",
+			"amd",
+			"};\n",
+			"padding",
+			"pgm_read",
+			"24",
+			"*/\n",
+			"$",
+			"opnum",
+			"setreg(0x08",
+			"};\n",
+			"ls",
+			"ame_ebs",
+			"ame_ens",
+			"unset_note",
+			"rd",
+			"buzzer",
+			"!",
+			"cmd_ack",
+			"((",
+			"pind",
+			"parasit",
+			"PARAS",
+			"ignore_errors",
+			"digitalwrite",
+			"searc",
+			"button_shutter",
+			" slave",
+			"slave ",
+			"44",
+			"48",
+			"44h",
+			"user44h",
+			"attach44h",
+			"Not an Interrupt Pin",
+			"\n			",
+			"serial",
+			"PresenceDuration",
+			"ReadBitSamplingTime",
+			"resetmaxd",
+			"bufferPos_",
+			"bufferBitPos_",
+			"ReceiveCommand",
+			"beginwaitre",
+			"error_",
+			"Pin",
+			"flap",
+			"get_middle",
+			"FLAPS_CHANNEL",
+			"FLAP",
+			"flap",
+			"FLAP",
+			"flaps",
+			"flap",
+			"throttle",
+			"flap",
+			"yaw",
+			"hz",
+			"ledco",
+			"/*",
+			"latch",
+			"serial.",
+			"ANALOG_VOLTAGE_3",
+			"write",
+			"tx_de",
+			"debug",
+			"print",
+			"write",
+			"print",
+			"Print",
+			"write",
+			"debug_pin",
+			"debugpin",
+			"SendOnlySoftwareSerial",
+			"SoftwareSerial",
+			"airpla",
+			"write_reg(2, ",
+			"write_reg(1, ",
+			"chec",
+			"upda",
+			"write_reg(1",
+			"xb4",
+			"translate_tabs_to_spaces",
+			"RD",
+			"mode_inactive",
+			"Out_SoudSample",
+			"0ut_SoudSample",
+			"spiReadRegister",
+			"spiWriteRegister",
+			"tab",
+			"space",
+			"stdou",
+			"PlayStr",
+			"PlayS",
+			"str_15",
+			"freq",
+			"period",
+			"note_c",
+			"humi",
+			"activate",
+			"SLAVE_DIFFBARO",
+			"write_s",
+			"sonar",
+			"humi",
+			"Sonar",
+			"MSP_RC",
+			"PCInt_RX_Pins",
+			"PCINT_RX_PORT",
+			"rx_rss",
+			"flaps",
+			"inje",
+			"rxInt",
+			"ppm",
+			"standard",
+			"RCAUXPI",
+			"RCAUXPIN8",
+			"RCAUXPI",
+			"RCAUXPIN8",
+			"SUM_PPM",
+			"RSSI",
+			"RX_RSSI_PIN",
+			"RSSI",
+			"pass",
+			"SERIAL_SUM_PPM",
+			"SHT21D"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"amem.",
+			"0x",
+			"soss",
+			"setreg(",
+			"write_reg(2",
+			"rf_read_reg",
+			"rf_write_reg",
+			"SOSS_SPEED",
+			"cycle_time",
+			"previous_time",
+			"current_time",
+			"sonar_init",
+			"device_mag_update",
+			"mag_init",
+			"gyro_init",
+			"baro_init",
+			"baro_common",
+			"acc_common",
+			"gyro_common",
+			"sonar_update",
+			"baro_update",
+			"mag_update",
+			"acc_init",
+			"acc_update",
+			"|)",
+			"PROGRAM",
+			"baro_calibration_counter",
+			"gyro_calibration_counter",
+			"baro_calibration_counter",
+			"acc_calibration_counter",
+			"VEHICLE_ARMED"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "ym2414b.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3493,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2166,
+								2166
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 1728.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "fs.cpp",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 2,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "opz.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9264,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								94,
+								94
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "opz.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1672,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								39,
+								39
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "tables.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 43564,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								76,
+								76
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": -0.0,
+						"translation.y": 4896.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "tables.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 580,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 24.0
+	},
+	"input":
+	{
+		"height": 32.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.I2C_GPS_NAV_v2_2":
+	{
+		"height": 106.0
+	},
+	"output.MultiWii":
+	{
+		"height": 106.0
+	},
+	"output.astyle_error_message":
+	{
+		"height": 0.0
+	},
+	"output.exec":
+	{
+		"height": 29.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.stino_log":
+	{
+		"height": 106.0
+	},
+	"project": "ym2414.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 221.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
